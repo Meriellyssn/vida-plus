@@ -3,7 +3,7 @@ import React from 'react';
 type ActionCardProps = {
   icon: string;
   title: string;
-  onClick?: () => void; // Ação a ser executada ao clicar (opcional)
+  onClick?: () => void;
 };
 
 export function ActionCard({ icon, title, onClick }: ActionCardProps) {
@@ -11,17 +11,15 @@ export function ActionCard({ icon, title, onClick }: ActionCardProps) {
     <a 
       href="#" 
       onClick={(e) => {
-        e.preventDefault(); // Previne que a página recarregue
-        if (onClick) {
-          onClick();
-        }
+        e.preventDefault();
+        if (onClick) onClick();
       }}
-      className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center justify-center text-center transition-all transform hover:-translate-y-1 hover:shadow-lg"
+      className="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center text-center transition-all transform hover:-translate-y-1 hover:shadow-lg h-full"
     >
-      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl mb-4">
+      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-3">
         <i className={`fas ${icon}`}></i>
       </div>
-      <div className="font-bold text-gray-700">{title}</div>
+      <div className="font-bold text-gray-700 text-sm">{title}</div>
     </a>
   );
 }
