@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-
+import logoVidaPlusColorida from '/src/assets/logo-branca.png';
 // Props para customizar o Header no futuro (nome do usuário, avatar, etc.)
 type HeaderProps = {
   userName: string;
@@ -19,7 +19,7 @@ export function Header({ userName, userAvatarUrl }: HeaderProps) {
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between py-4">
           <a href="#" className="text-2xl font-bold flex items-center">
-            <i className="fas fa-heartbeat mr-2"></i>
+            <img src={logoVidaPlusColorida} alt="Logo VidaPlus" className="w-8 h-8 mr-2" />
             <span>VidaPlus</span>
           </a>
 
