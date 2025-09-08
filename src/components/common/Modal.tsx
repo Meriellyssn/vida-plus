@@ -1,18 +1,35 @@
+// src/components/common/Modal.tsx
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import type { ReactNode } from 'react';
+
+// 1. Definimos os tamanhos que nosso modal pode ter
+type ModalSize = 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  size?: ModalSize; // 2. Adicionamos a propriedade 'size' (opcional)
 };
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+// 3. Criamos um "mapa de estilos" para os tamanhos, como fizemos com as prioridades
+const sizeClasses: Record<ModalSize, string> = {
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl', // <-- Um bom tamanho para formulários complexos
+  '5xl': 'max-w-5xl',
+};
+
+export function Modal({ isOpen, onClose, title, children, size = '2xl' }: ModalProps) { // O tamanho padrão será '2xl'
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
+        {/* ... (o código do Transition e do backdrop continua o mesmo) ... */}
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -36,7 +53,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+              {/* 4. Usamos a classe de tamanho dinâmica aqui */}
+              <Dialog.Panel className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all`}>
                 <div className="bg-gradient-to-r from-primary to-secondary p-6 text-white flex justify-between items-center">
                     <h3 className="text-xl font-bold leading-6">
                         {title}
