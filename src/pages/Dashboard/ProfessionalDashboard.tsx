@@ -74,11 +74,22 @@ const priorityStyles: Record<Paciente['prioridade'], string> = {
   "Baixo": "bg-green-100 text-green-700",
 };
 
+const activityTypeStyles: Record<Atividade['tipo'], string> = {
+  "Consulta": "bg-green-100 text-green-700",
+  "Receita": "bg-blue-100 text-blue-700",
+  "Exame": "bg-yellow-100 text-yellow-700",
+};
+
 export function ProfessionalDashboard() {
   const [isProntuarioModalOpen, setIsProntuarioModalOpen] = useState(false);
-
   const openProntuarioModal = () => setIsProntuarioModalOpen(true);
   const closeProntuarioModal = () => setIsProntuarioModalOpen(false);
+
+  const [formPaciente, setFormPaciente] = useState('');
+  const [formQueixa, setFormQueixa] = useState('');
+  const [formExameFisico, setFormExameFisico] = useState('');
+  const [formHipotese, setFormHipotese] = useState('');
+
   const [currentDateTime, setCurrentDateTime] = useState<string>("");
 
   useEffect(() => {
@@ -204,42 +215,122 @@ export function ProfessionalDashboard() {
 
         {/* ROW 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          {/* Ações rápidas */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              <i className="fas fa-bolt mr-2 text-primary"></i>Ações Rápidas
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <QuickActionButton icon="fa-file-medical-alt" label="Novo Prontuário" onClick={openProntuarioModal} />
-              <QuickActionButton icon="fa-prescription" label="Prescrever" onClick={() => alert("Prescrição")} />
-              <QuickActionButton icon="fa-microscope" label="Solicitar Exame" onClick={() => alert("Exame")} />
-              <QuickActionButton icon="fa-video" label="Telemedicina" onClick={() => alert("Telemedicina")} />
+          {/* AÇÕES RÁPIDAS */}
+          <div className="lg:col-span-1 bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 font-bold flex items-center">
+              <i className="fas fa-bolt mr-2"></i> Ações Rápidas
+            </div>
+
+            {/* Body */}
+            <div className="p-4 flex-grow flex flex-col">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Quick Actions */}
+                <a
+                  href="#"
+                  onClick={() => setIsProntuarioModalOpen(true)}
+                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
+                    <i className="fas fa-file-medical-alt"></i>
+                  </div>
+                  <div className="font-semibold text-xs">Novo Prontuário</div>
+                </a>
+
+                <a
+                  href="#"
+                  onClick={() => alert("Abrir modal de prescrição...")}
+                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
+                    <i className="fas fa-prescription"></i>
+                  </div>
+                  <div className="font-semibold text-xs">Prescrever</div>
+                </a>
+
+                <a
+                  href="#"
+                  onClick={() => alert("Exames em breve...")}
+                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
+                    <i className="fas fa-microscope"></i>
+                  </div>
+                  <div className="font-semibold text-xs">Solicitar Exame</div>
+                </a>
+
+                <a
+                  href="#"
+                  onClick={() => alert("Telemedicina em breve...")}
+                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
+                    <i className="fas fa-video"></i>
+                  </div>
+                  <div className="font-semibold text-xs">Telemedicina</div>
+                </a>
+              </div>
+
+              {/* Botão principal */}
+              <button
+                onClick={() => setIsProntuarioModalOpen(true)}
+                className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition mt-4"
+              >
+                <i className="fas fa-plus mr-2"></i> Atender Paciente
+              </button>
             </div>
           </div>
 
-          {/* Atividade Recente */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              <i className="fas fa-history mr-2 text-primary"></i>Atividade Recente
-            </h2>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {mockData.atividadeRecente.map((a) => (
-                <div key={a.id} className="border-b pb-3 last:border-none flex justify-between">
-                  <div>
-                    <p className="font-semibold">{a.descricao}</p>
-                    <p className="text-sm text-gray-500">{a.detalhes}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">{a.tempo}</p>
-                    <span className="text-xs font-bold px-2 py-1 bg-gray-100 rounded-full">
-                      {a.tipo}
-                    </span>
+          {/* ATIVIDADE RECENTE */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 font-bold flex justify-between items-center">
+              <span>
+                <i className="fas fa-history mr-2"></i> Atividade Recente
+              </span>
+              <button
+                onClick={() => alert("Relatórios em breve...")}
+                className="text-xs font-semibold bg-white/20 hover:bg-white/30 py-1 px-3 rounded-full transition"
+              >
+                Ver Relatórios
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 flex-grow overflow-y-auto max-h-96">
+              {mockData.atividadeRecente.map((a, index) => (
+                <div
+                  key={a.id}
+                  className={`relative pl-8 pb-4 ${
+                    // Adiciona a linha do tempo em todos, menos no último item
+                    index === mockData.atividadeRecente.length - 1 ? "" : "border-l-2 border-gray-200"
+                    }`}
+                >
+                  {/* Ponto da linha do tempo */}
+                  <div className="absolute -left-[9px] top-1 w-4 h-4 bg-primary rounded-full border-4 border-white"></div>
+
+                  {/* Conteúdo do item */}
+                  <div className="flex justify-between items-start">
+                    {/* Lado Esquerdo: Descrição e Detalhes */}
+                    <div>
+                      <p className="font-bold text-gray-800">{a.descricao}</p>
+                      <p className="text-sm text-gray-600">{a.detalhes}</p>
+                    </div>
+
+                    {/* Lado Direito: Tempo e Tag de Tipo */}
+                    <div className="text-right flex-shrink-0 ml-4">
+                      <p className="text-xs text-gray-500">{a.tempo}</p>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full mt-1 inline-block ${activityTypeStyles[a.tipo]}`}>
+                        {a.tipo}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
       </main>
       <Modal
         isOpen={isProntuarioModalOpen}
@@ -247,14 +338,15 @@ export function ProfessionalDashboard() {
         title="Atendimento - Novo Prontuário"
         size="5xl"
       >
-        <form onSubmit={(e) => { e.preventDefault(); alert('Prontuário salvo!'); closeProntuarioModal(); }}>
+        <form onSubmit={(e) => { e.preventDefault(); alert(`Prontuário salvo para o paciente: ${formPaciente} com a queixa: ${formQueixa}`); closeProntuarioModal(); setFormPaciente(''); setFormQueixa('');setFormExameFisico(''); setFormHipotese(''); }}>
           {/* Linha 1: Paciente, Tipo, Data */}
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
             <div className="md:col-span-3">
               <label htmlFor="pacienteProntuario" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-user mr-2 text-gray-400"></i>Paciente
               </label>
-              <select id="pacienteProntuario" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <select id="pacienteProntuario" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" value={formPaciente}
+                onChange={(e) => setFormPaciente(e.target.value)} required >
                 <option value="">Selecione um paciente</option>
                 <option value="1">Carlos Santos - 39 anos</option>
                 <option value="2">Maria Oliveira - 52 anos</option>
@@ -288,7 +380,7 @@ export function ProfessionalDashboard() {
               <label htmlFor="queixaPrincipal" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-comment-medical mr-2 text-gray-400"></i>Queixa Principal
               </label>
-              <textarea id="queixaPrincipal" rows={5} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva a queixa principal do paciente..."></textarea>
+              <textarea id="queixaPrincipal" rows={5} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva a queixa principal do paciente..." value={formQueixa} onChange={(e) => setFormQueixa(e.target.value)}></textarea>
             </div>
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
@@ -309,13 +401,13 @@ export function ProfessionalDashboard() {
               <label htmlFor="exameFisico" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-search mr-2 text-gray-400"></i>Exame Físico
               </label>
-              <textarea id="exameFisico" rows={4} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva os achados do exame físico..."></textarea>
+              <textarea id="exameFisico" rows={4} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva os achados do exame físico..." value={formExameFisico} onChange={(e) => setFormExameFisico(e.target.value)}></textarea>
             </div>
             <div>
               <label htmlFor="hipoteseDiagnostica" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-diagnoses mr-2 text-gray-400"></i>Hipótese Diagnóstica
               </label>
-              <textarea id="hipoteseDiagnostica" rows={3} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="CID-10 e descrição do diagnóstico..."></textarea>
+              <textarea id="hipoteseDiagnostica" rows={3} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="CID-10 e descrição do diagnóstico..." value={formHipotese} onChange={(e) => setFormHipotese(e.target.value)}></textarea>
             </div>
           </div>
 
