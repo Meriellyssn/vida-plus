@@ -141,9 +141,19 @@ export function PatientDashboard() {
     alert("Funcionalidade ainda não implementada.");
   };
 
+  const patientNavLinks = [
+  { path: '/dashboard-paciente', label: 'Início', icon: 'fa-home' },
+  { path: '/agendamentos', label: 'Agendamentos', icon: 'fa-calendar-alt' },
+  { path: '/historico', label: 'Histórico', icon: 'fa-file-medical' },
+  { path: '/telemedicina', label: 'Telemedicina', icon: 'fa-video' },
+];
+
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header userName={mockData.paciente.nome} userAvatarUrl={mockData.paciente.avatarUrl} />
+      <Header 
+      userName={mockData.paciente.nome} 
+      userAvatarUrl={mockData.paciente.avatarUrl} 
+      navLinks={patientNavLinks}/>
 
       <main className="container mx-auto p-4 md:p-8">
           <div className="bg-gradient-to-r from-primary to-secondary text-white p-8 rounded-2xl shadow-lg flex items-center justify-between mb-8">

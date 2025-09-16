@@ -117,13 +117,20 @@ export function ProfessionalDashboard() {
     (c) => c.status === "Confirmado" || c.status === "Em Andamento"
   );
 
+  const professionalNavLinks = [
+    { path: "/dashboard-profissional", label: "Início", icon: "fa-home" },
+    { path: "/agenda", label: "Agenda", icon: "fa-calendar-alt" },
+    { path: "/pacientes", label: "Pacientes", icon: "fa-users" },
+    { path: "/prontuarios", label: "Prontuários", icon: "fa-file-medical" },
+];
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* HEADER */}
       <Header
         userName={mockData.medico.nome}
-        userAvatarUrl={mockData.medico.avatar}
-      />
+        userAvatarUrl={mockData.medico.avatar} 
+        navLinks={professionalNavLinks}/>
 
       <main className="container mx-auto p-6">
         {/* WELCOME */}
