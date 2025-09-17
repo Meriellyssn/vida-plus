@@ -9,7 +9,10 @@ type StatCardProps = {
 
 export function StatCard({ icon, value, label }: StatCardProps) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center text-center transition-transform transform hover:-translate-y-1">
+    <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center text-center transition-transform transform hover:-translate-y-1 relative overflow-hidden">
+      
+      {/* 2. Adicione este novo div para a linha de gradiente */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary"></div>
       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl mb-4">
         <i className={`fas ${icon}`}></i>
       </div>

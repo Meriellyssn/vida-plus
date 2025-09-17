@@ -13,7 +13,7 @@ import { Line, Doughnut } from 'react-chartjs-2';
 const mockAdminData = {
   admin: {
     nome: 'Dr. João Admin',
-    avatarUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=80&h=80&fit=crop&crop=face',
+    avatarUrl: 'https://i.ibb.co/4n9dyrfQ/22.png',
   },
 
   usuarios: [

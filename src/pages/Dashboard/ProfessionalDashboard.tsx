@@ -172,12 +172,11 @@ export function ProfessionalDashboard() {
         {/* CONTENT ROWS */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Agenda */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              <i className="fas fa-calendar-alt mr-2 text-primary"></i>
-              Agenda de Hoje
-            </h2>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+                <i className="fas fa-bolt mr-2"></i>Ações Rápidas
+              </div>
+            <div className="p-6 max-h-96 overflow-y-auto">
               {mockData.agendaHoje.map((c) => (
                 <div
                   key={c.id}
@@ -196,12 +195,11 @@ export function ProfessionalDashboard() {
           </div>
 
           {/* Pacientes Prioritários */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              <i className="fas fa-user-injured mr-2 text-primary"></i>
-              Pacientes Prioritários
-            </h2>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+                <i className="fas fa-user-injured mr-2"></i>Pacientes Prioritários
+              </div>
+            <div className="p-3 space-y-4 max-h-96 overflow-y-auto">
               {mockData.pacientesPrioritarios.map((p) => (
                 <div key={p.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center gap-3">
