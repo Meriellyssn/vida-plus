@@ -1,69 +1,95 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🏥 Vida Plus – Sistema de Gestão Hospitalar e de Serviços de Saúde (Front-end)
 
-Currently, two official plugins are available:
+O **Vida Plus** é um sistema web desenvolvido com foco em **gestão hospitalar e de serviços de saúde**, oferecendo uma interface intuitiva, responsiva e acessível para profissionais da área médica, pacientes e administradores.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este repositório contém a implementação **front-end** do sistema, utilizando tecnologias modernas para garantir **desempenho, escalabilidade e usabilidade**.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Tecnologias Utilizadas
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* **React** + **Vite** → Framework moderno para construção da interface.
+* **TypeScript** → Tipagem estática para maior segurança e escalabilidade do código.
+* **Tailwind CSS** → Estilização rápida, responsiva e customizável.
+* **ESLint** + **PostCSS** → Padronização e otimização do código.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🎯 Funcionalidades Principais
+
+✔️ Autenticação de usuários (login e cadastro).
+✔️ Painel administrativo para gestão hospitalar.
+✔️ Dashboard interativo com gráficos e KPIs.
+✔️ Interface responsiva e adaptada para dispositivos móveis.
+✔️ Componentização para fácil manutenção e expansão.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+vida-plus/
+ ├── public/               # Arquivos estáticos
+ ├── src/                  # Código-fonte principal
+ │   ├── assets/           # Imagens e ícones
+ │   ├── components/       # Componentes reutilizáveis
+ │   ├── pages/            # Páginas do sistema (Login, Dashboard, etc.)
+ │   ├── config/           # Configurações (ex.: Chart.js)
+ │   └── main.tsx          # Ponto de entrada da aplicação
+ ├── index.html            # HTML base
+ ├── package.json          # Dependências e scripts
+ ├── tailwind.config.js    # Configuração do Tailwind
+ └── tsconfig.json         # Configuração do TypeScript
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Como Rodar o Projeto Localmente
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Clonar o repositório**
+
+   ```bash
+   git clone https://github.com/Meriellyssn/vida-plus.git
+   cd vida-plus
+   ```
+
+2. **Instalar as dependências**
+
+   ```bash
+   npm install
+   ```
+
+3. **Rodar o projeto em ambiente de desenvolvimento**
+
+   ```bash
+   npm run dev
+   ```
+
+4. Acesse no navegador:
+
+   ```
+   http://localhost:5173
+   ```
+
+---
+
+## 📊 Exemplos de Uso
+
+* **Login de Usuário:** autenticação segura para pacientes e administradores.
+* **Dashboard Administrativo:** acompanhamento de indicadores hospitalares.
+* **Gestão de Usuários e Serviços:** CRUD de dados médicos e administrativos.
+
+---
+
+## 👩‍💻 Autora
+
+**Meirielly Silva Sousa do Nascimento**
+📌 Projeto desenvolvido como parte da disciplina de **Análise e Desenvolvimento de Sistemas**.
+
+---
+
+## 📜 Licença
+
+Este projeto é de uso acadêmico e educativo.
+Você pode utilizá-lo para estudos, melhorias e referências.
