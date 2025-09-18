@@ -66,12 +66,17 @@ export function Header() {
   // AQUI ESTÁ A MÁGICA: Escolhemos a lista de links correta com base no tipo do usuário
   const navLinks = navLinksConfig[currentUser.tipo];
 
+  const homePath = 
+    currentUser.tipo === 'paciente' ? '/dashboard-paciente' :
+    currentUser.tipo === 'profissional' ? '/dashboard-profissional' :
+    '/dashboard-admin';
+
   // O JSX do Header agora usa as variáveis 'currentUser' e 'navLinks'
   return (
     <header className="bg-gradient-to-r from-primary to-secondary text-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between py-3">
-          <NavLink to="/" className="text-2xl font-bold flex items-center">
+          <NavLink to={homePath} className="text-2xl font-bold flex items-center">
             <img src="/src/assets/logo-branca.png" alt="Logo VidaPlus Branca"
               className="w-8 h-8 mr-2" />
             <span>VidaPlus</span>
