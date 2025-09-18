@@ -1,90 +1,96 @@
-// src/pages/Shared/TelemedicinaPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../../components/Layout/Header';
+import { useNavigate } from 'react-router-dom';
 
-// Dados simulados para a página
-const mockTelemedicinaData = {
-    userName: 'Carlos Santos',
-    userAvatar: 'https://i.ibb.co/ns2tPQzS/21.png',
-    proximaConsulta: {
-        id: 'tele-1',
-        medico: 'Dra. Ana Costa',
+// --- NOVO: Dados mais completos para a consulta ---
+const mockConsulta = {
+    id: 'tele-1',
+    data: '2025-09-20',
+    hora: '11:00',
+    tipo: 'Consulta de Retorno', // <-- Adicionado
+    medico: {
+        nome: 'Dra. Ana Costa',
         especialidade: 'Clínica Geral',
-        data: '2025-09-20',
-        hora: '11:00',
-        avatarMedico: 'https://i.postimg.cc/SRkrLP16/17.png'
-    }
+        crm: '12345-SP', // <-- Adicionado
+        avatar: 'https://i.postimg.cc/SRkrLP16/17.png'
+    },
+    paciente: {
+        nome: 'Carlos Santos',
+        idade: 35,
+        avatar: 'https://i.ibb.co/ns2tPQzS/21.png',
+    },
+    observacoes: 'Consulta de retorno.'
 };
 
-const navLinks = [
-    { path: '/dashboard-paciente', label: 'Início', icon: 'fa-home' },
-    { path: '/agendamentos', label: 'Agendamentos', icon: 'fa-calendar-alt' },
-    { path: '/historico', label: 'Histórico', icon: 'fa-file-medical' },
-    { path: '/telemedicina', label: 'Telemedicina', icon: 'fa-video' },
-];
+// Interface para sabermos o formato do nosso usuário logado
+interface CurrentUser {
+    tipo: 'paciente' | 'profissional' | 'admin';
+    nome: string;
+    avatarUrl: string;
+}
 
-// --- O Componente da Página ---
 export function TelemedicinaPage() {
+    const navigate = useNavigate();
     const [testeConexao, setTesteConexao] = useState<'testando' | 'ok' | 'falhou' | null>(null);
     const [chamadaAtiva, setChamadaAtiva] = useState(false);
 
-    const testarConexao = () => {
-        setTesteConexao('testando');
-        // Simula um teste que pode falhar ou ter sucesso
-        setTimeout(() => {
-            const sucesso = Math.random() > 0.3; // 70% de chance de sucesso
-            setTesteConexao(sucesso ? 'ok' : 'falhou');
-            setTimeout(() => setTesteConexao(null), 4000); // Limpa o status depois de um tempo
-        }, 2000);
-    };
+    // --- NOVO: Estado para guardar o usuário logado ---
+    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+
+    useEffect(() => {
+        // Ao carregar a página, lemos quem está logado
+        const userJson = localStorage.getItem('currentUser');
+        if (userJson) {
+            setCurrentUser(JSON.parse(userJson));
+        }
+    }, []);
+
+    const testarConexao = () => { /* ... (função continua a mesma) ... */ };
 
     // Se a chamada estiver ativa, mostra a tela de videochamada
     if (chamadaAtiva) {
         return <VideoCallScreen onEndCall={() => setChamadaAtiva(false)} />;
     }
 
-    // Se não, mostra a sala de espera
+    // --- LÓGICA CONDICIONAL ---
+    const isPaciente = currentUser?.tipo === 'paciente';
+    const nomeExibido = isPaciente ? mockConsulta.medico.nome : mockConsulta.paciente.nome;
+    const detalhesExibidos = isPaciente
+        ? `${mockConsulta.medico.especialidade} - CRM ${mockConsulta.medico.crm}`
+        : `Paciente - ${mockConsulta.paciente.idade} anos`;
+    const avatarExibido = isPaciente ? mockConsulta.medico.avatar : mockConsulta.paciente.avatar;
+
     return (
         <div className="bg-gray-50 min-h-screen">
-            <Header 
-                userName={mockTelemedicinaData.userName} 
-                userAvatarUrl={mockTelemedicinaData.userAvatar} 
-                navLinks={navLinks} 
-            />
+            <Header />
 
             <main className="container mx-auto p-4 md:p-8">
-                {/* Cabeçalho da Página */}
-                <div className="bg-gradient-to-r from-primary to-secondary text-white p-6 rounded-2xl shadow-lg mb-8 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">Sala de Espera - Telemedicina</h1>
-                        <p className="opacity-90 mt-1">Sua consulta online segura e de qualidade.</p>
-                    </div>
-                    <i className="fas fa-video text-5xl text-white/20 hidden md:block"></i>
-                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Coluna Principal (Esquerda) */}
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Card da Próxima Consulta */}
+                        {/* --- CARD DA PRÓXIMA CONSULTA ATUALIZADO --- */}
                         <Card>
                             <CardHeader title="Próxima Consulta Online" icon="fa-clock" />
                             <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-4">
-                                    <img src={mockTelemedicinaData.proximaConsulta.avatarMedico} alt={mockTelemedicinaData.proximaConsulta.medico} className="w-20 h-20 rounded-full border-4 border-secondary" />
+                                    <img src={avatarExibido} alt={nomeExibido} className="w-20 h-20 rounded-full border-4 border-secondary" />
                                     <div>
-                                        <p className="text-xl font-bold text-gray-800">{mockTelemedicinaData.proximaConsulta.medico}</p>
-                                        <p className="text-gray-600">{mockTelemedicinaData.proximaConsulta.especialidade}</p>
+                                        <p className="text-xl font-bold text-gray-800">{nomeExibido}</p>
+                                        <p className="text-gray-600">{detalhesExibidos}</p>
                                         <p className="text-sm text-gray-500 mt-2">
-                                            {new Date(mockTelemedicinaData.proximaConsulta.data).toLocaleDateString('pt-BR', { dateStyle: 'long' })} às {mockTelemedicinaData.proximaConsulta.hora}
+                                            {new Date(mockConsulta.data).toLocaleDateString('pt-BR', { dateStyle: 'long' })} às {mockConsulta.hora}
+                                        </p>
+                                        <p className="text-sm text-gray-500 mt-2 capitalize">
+                                            <i className="fas fa-notes-medical mr-2"></i>{mockConsulta.observacoes || mockConsulta.tipo}
                                         </p>
                                     </div>
                                 </div>
-                                <button onClick={() => setChamadaAtiva(true)} className="w-full md:w-auto px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center">
+                                <button onClick={() => navigate('/chamada-video')} className="w-full md:w-auto px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center">
                                     <i className="fas fa-video mr-2"></i>Entrar na Chamada
                                 </button>
                             </div>
                         </Card>
-                        
+
                         {/* Card de Status da Conexão */}
                         <Card>
                             <CardHeader title="Status da Conexão" icon="fa-wifi" />
@@ -166,7 +172,7 @@ const StatusIndicator: React.FC<{ text: string, color: 'green' | 'red' | 'blue' 
 };
 
 // Passo a passo de "Como Funciona"
-const InfoStep: React.FC<{icon: string, color: string, title: string, text: string}> = ({icon, color, title, text}) => {
+const InfoStep: React.FC<{ icon: string, color: string, title: string, text: string }> = ({ icon, color, title, text }) => {
     const colors = {
         blue: 'bg-blue-100 text-blue-600',
         green: 'bg-green-100 text-green-600',

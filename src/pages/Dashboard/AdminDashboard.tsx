@@ -128,6 +128,16 @@ const userTypeIcons = {
 
 export function AdminDashboard() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  const [formNome, setFormNome] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formCpf, setFormCpf] = useState('');
+  const [formTelefone, setFormTelefone] = useState('');
+  const [formTipoUsuario, setFormTipoUsuario] = useState('');
+  const [formEspecialidade, setFormEspecialidade] = useState('');
+  const [formSenha, setFormSenha] = useState('');
+  const [formStatus, setFormStatus] = useState('ativo');
+
   const [userType, setUserType] = useState(''); // Estado para o campo 'Tipo de Usuário'
   const [chartPeriod, setChartPeriod] = useState('3M');
 
@@ -137,22 +147,44 @@ export function AdminDashboard() {
     setUserType(''); // Limpa o tipo de usuário ao fechar o modal
   };
 
+  const handleUserSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Previne o recarregamento da página
+
+    // Cria um objeto com todos os dados do formulário
+    const novoUsuario = {
+      nome: formNome,
+      email: formEmail,
+      cpf: formCpf,
+      telefone: formTelefone,
+      tipo: formTipoUsuario,
+      especialidade: formEspecialidade,
+      status: formStatus,
+    };
+
+    // Mostra os dados no console (ótimo para debugar!)
+    console.log("Novo Usuário Cadastrado:", novoUsuario);
+    alert(`Usuário ${formNome} cadastrado com sucesso!`);
+
+    // Limpa o formulário e fecha o modal
+    setFormNome('');
+    setFormEmail('');
+    setFormCpf('');
+    setFormTelefone('');
+    setFormTipoUsuario('');
+    setFormEspecialidade('');
+    setFormSenha('');
+    setFormStatus('ativo');
+    closeUserModal();
+  };
+
   const showNotImplemented = () => {
     alert("Funcionalidade ainda não implementada.");
   };
 
-  const adminNavLinks = [
-  { path: '/dashboard-admin', label: 'Início', icon: 'fa-home' },
-  { path: '/usuarios', label: 'Usuários', icon: 'fa-users' },
-  { path: '/relatorios', label: 'Relatórios', icon: 'fa-chart-bar' },
-  { path: '/sistema', label: 'Sistema', icon: 'fa-cog' },
-];
+
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header 
-      userName={mockAdminData.admin.nome} 
-      userAvatarUrl={mockAdminData.admin.avatarUrl}
-      navLinks={adminNavLinks}/>
+      <Header />
 
       <main className="container mx-auto p-4 md:p-8">
         {/* SEÇÃO DE BOAS-VINDAS E KPIS */}
@@ -440,51 +472,53 @@ export function AdminDashboard() {
         title="Cadastrar Novo Usuário"
         size="4xl"
       >
-        <form onSubmit={(e) => { e.preventDefault(); alert('Usuário Salvo!'); closeUserModal(); }}>
+        <form onSubmit={handleUserSubmit}> {/* <-- Conectamos a nova função aqui */}
           <div className="space-y-4">
             {/* Linha 1: Nome e Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="nomeCompleto" className="block text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-user mr-2 text-gray-400"></i>Nome Completo</label>
-                <input type="text" id="nomeCompleto" className="w-full p-2 border border-gray-300 rounded-md" required />
+                <label htmlFor="nomeCompleto" className="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                <input type="text" id="nomeCompleto" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formNome} onChange={(e) => setFormNome(e.target.value)} required />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-envelope mr-2 text-gray-400"></i>Email</label>
-                <input type="email" id="email" className="w-full p-2 border border-gray-300 rounded-md" required />
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
               </div>
             </div>
 
             {/* Linha 2: CPF e Telefone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-id-card mr-2 text-gray-400"></i>CPF</label>
-                <input type="text" id="cpf" placeholder="000.000.000-00" className="w-full p-2 border border-gray-300 rounded-md" required />
+                <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                <input type="text" id="cpf" placeholder="000.000.000-00" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formCpf} onChange={(e) => setFormCpf(e.target.value)} required />
               </div>
               <div>
-                <label htmlFor="telefone" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-phone mr-2 text-gray-400"></i>Telefone</label>
-                <input type="text" id="telefone" placeholder="(00) 00000-0000" className="w-full p-2 border border-gray-300 rounded-md" required />
+                <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                <input type="text" id="telefone" placeholder="(00) 00000-0000" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formTelefone} onChange={(e) => setFormTelefone(e.target.value)} required />
               </div>
             </div>
 
             {/* Linha 3: Tipo e Especialidade */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="tipoUsuario" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-user-tag mr-2 text-gray-400"></i>Tipo de Usuário</label>
-                <select id="tipoUsuario" className="w-full p-2 border border-gray-300 rounded-md" value={userType} onChange={(e) => setUserType(e.target.value)} required>
+                <label htmlFor="tipoUsuario" className="block text-sm font-medium text-gray-700 mb-1">Tipo de Usuário</label>
+                <select id="tipoUsuario" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formTipoUsuario} onChange={(e) => setFormTipoUsuario(e.target.value)} required>
                   <option value="">Selecione o tipo</option>
                   <option value="paciente">Paciente</option>
                   <option value="medico">Médico</option>
-                  <option value="enfermeiro">Enfermeiro</option>
-                  <option value="recepcionista">Recepcionista</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>
-              {/* Campo condicional para Especialidade */}
-              {userType === 'medico' && (
+              {formTipoUsuario === 'medico' && (
                 <div>
-                  <label htmlFor="especialidade" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-stethoscope mr-2 text-gray-400"></i>Especialidade</label>
-                  <select id="especialidade" className="w-full p-2 border border-gray-300 rounded-md" required>
-                    <option value="">Selecione uma especialidade</option>
+                  <label htmlFor="especialidade" className="block text-sm font-medium text-gray-700 mb-1">Especialidade</label>
+                  <select id="especialidade" className="w-full p-2 border border-gray-300 rounded-md"
+                    value={formEspecialidade} onChange={(e) => setFormEspecialidade(e.target.value)} required>
                     <option value="cardiologia">Cardiologia</option>
                     <option value="dermatologia">Dermatologia</option>
                     <option value="ginecologia">Ginecologia</option>
@@ -504,38 +538,29 @@ export function AdminDashboard() {
             {/* Linha 4: Senha e Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="senha" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-lock mr-2 text-gray-400"></i>Senha Temporária</label>
-                <div className="flex">
-                  <input type="password" id="senha" className="w-full p-2 border border-gray-300 rounded-l-md" required />
-                  <button type="button" onClick={() => alert('Nova senha gerada!')} className="px-3 border-y border-r border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md">
-                    <i className="fas fa-random text-gray-600"></i>
-                  </button>
-                </div>
+                <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-1">Senha Temporária</label>
+                <input type="password" id="senha" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formSenha} onChange={(e) => setFormSenha(e.target.value)} required />
               </div>
               <div>
-                <label htmlFor="status" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-toggle-on mr-2 text-gray-400"></i>Status</label>
-                <select id="status" className="w-full p-2 border border-gray-300 rounded-md">
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="status" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formStatus} onChange={(e) => setFormStatus(e.target.value)}>
                   <option value="ativo">Ativo</option>
                   <option value="inativo">Inativo</option>
-                  <option value="pendente">Pendente</option>
                 </select>
               </div>
             </div>
 
-            {/* Observações */}
-            <div>
-              <label htmlFor="observacoes" className="text-sm font-medium text-gray-700 mb-1 flex items-center"><i className="fas fa-comment mr-2 text-gray-400"></i>Observações</label>
-              <textarea id="observacoes" rows={3} className="w-full p-2 border border-gray-300 rounded-md" placeholder="Observações sobre o usuário (opcional)"></textarea>
-            </div>
           </div>
 
           {/* Botões do Footer */}
           <div className="mt-8 pt-4 border-t flex justify-end space-x-3">
-            <button type="button" onClick={closeUserModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
-              <i className="fas fa-times mr-2"></i>Cancelar
+            <button type="button" onClick={closeUserModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+              Cancelar
             </button>
-            <button type="submit" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-lg hover:opacity-90 transition-opacity flex items-center">
-              <i className="fas fa-save mr-2"></i>Cadastrar Usuário
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
+              Cadastrar Usuário
             </button>
           </div>
         </form>

@@ -2,47 +2,40 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoVidaPlus from '/src/assets/logo.png';
 
-// Componente funcional da página de login
+// Usuários simulados para o teste de login
+const mockUsers = {
+  'paciente@vidaplus.com': { tipo: 'paciente', nome: 'Carlos Santos', avatarUrl: 'https://i.ibb.co/ns2tPQzS/21.png' },
+  'medico@vidaplus.com': { tipo: 'profissional', nome: 'Dra. Maria Silva', avatarUrl: 'https://i.postimg.cc/rsj9f97v/16.png' },
+  'admin@vidaplus.com': { tipo: 'admin', nome: 'Dr. João Admin', avatarUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=80&h=80&fit=crop&crop=face' },
+};
+
 export function LoginPage() {
-  // --- Estados do formulário ---
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('paciente@vidaplus.com'); // Valor inicial para facilitar o teste
+  const [password, setPassword] = useState('123456'); // Valor inicial para facilitar o teste
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
-
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
-  // --- Função de validação do formulário ---
-  const validateForm = () => {
-    const newErrors = { email: '', password: '' };
-    let isValid = true;
-    // Validação do email/CPF
-    if (!email) {
-      newErrors.email = 'Por favor, insira um email ou CPF.';
-      isValid = false;
-    }
-        // Validação da senha (mínimo de 6 caracteres)
-    if (password.length < 6) {
-      newErrors.password = 'A senha deve ter pelo menos 6 caracteres.';
-      isValid = false;
-    }
 
-    setErrors(newErrors); // Atualiza o estado de erros
-    return isValid; // Retorna true se válido, false caso contrário
-  };
-   // --- Função que trata o evento de login ---
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return; // Para a execução se o formulário for inválido
-    }
-
     setIsLoading(true);
     
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/dashboard-paciente'); 
-}, 2000);
+      const user = mockUsers[email as keyof typeof mockUsers];
+
+      if (user && password === '123456') {
+        // A MÁGICA ACONTECE AQUI: Salvamos os dados do usuário no navegador
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        // Redireciona para o dashboard correto
+        if (user.tipo === 'paciente') navigate('/dashboard-paciente');
+        if (user.tipo === 'profissional') navigate('/dashboard-profissional');
+        if (user.tipo === 'admin') navigate('/dashboard-admin');
+      } else {
+        alert('Email ou senha inválidos!');
+      }
+    }, 1500);
   };
   // --- Renderização do componente ---
   return (
@@ -122,7 +115,7 @@ export function LoginPage() {
               <div className="space-y-2 text-sm text-gray-600">
                 <div><strong>Admin:</strong> admin@vidaplus.com | 123456</div>
                 <div><strong>Médico:</strong> medico@vidaplus.com | 123456</div>
-                <div><strong>Paciente:</strong> 12345678900 | 123456</div>
+                <div><strong>Paciente:</strong> paciente@vidaplus.com | 123456</div>
               </div>
             </div>
           </form>

@@ -22,6 +22,7 @@ import { AgendamentosPage } from './pages/Patient/AgendamentosPage.tsx';
 
 // Telemedicina
 import { TelemedicinaPage } from './pages/Shared/TelemedicinaPage.tsx';
+import { VideoCallPage } from './pages/Shared/VideoCallPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
   { path: '/agenda', element: <AgendaPage /> },
   { path: '/agendamentos', element: <AgendamentosPage /> },
   { path: '/telemedicina', element: <TelemedicinaPage /> }, // <-- Adicionamos a nova rota
-  // (No futuro, adicione as rotas /historico e /telemedicina aqui também)
+  { path: '/chamada-video', element: <VideoCallPage /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

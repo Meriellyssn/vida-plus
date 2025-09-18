@@ -1,5 +1,6 @@
 // src/pages/Dashboard/ProfessionalDashboard.tsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "../../components/Layout/Header";
 import { StatCard } from "../../components/Dashboard/StatCard";
 import { QuickActionButton } from "../../components/Dashboard/QuickActionButton";
@@ -81,14 +82,24 @@ const activityTypeStyles: Record<Atividade['tipo'], string> = {
 };
 
 export function ProfessionalDashboard() {
-  const [isProntuarioModalOpen, setIsProntuarioModalOpen] = useState(false);
-  const openProntuarioModal = () => setIsProntuarioModalOpen(true);
-  const closeProntuarioModal = () => setIsProntuarioModalOpen(false);
+  const navigate = useNavigate();
 
-  const [formPaciente, setFormPaciente] = useState('');
+  const [isProntuarioModalOpen, setIsProntuarioModalOpen] = useState(false);
+  const [formPacienteId, setFormPacienteId] = useState('');
+  const [formTipoConsulta, setFormTipoConsulta] = useState('consulta');
   const [formQueixa, setFormQueixa] = useState('');
+  const [formSinaisVitais, setFormSinaisVitais] = useState({ pa: '', fc: '', peso: '', temp: '' });
   const [formExameFisico, setFormExameFisico] = useState('');
   const [formHipotese, setFormHipotese] = useState('');
+
+  const openProntuarioModal = () => setIsProntuarioModalOpen(true);
+  const closeProntuarioModal = () => {
+    setIsProntuarioModalOpen(false);
+    // Limpa o formulário ao fechar
+    setFormPacienteId('');
+    setFormTipoConsulta('consulta');
+    setFormQueixa('');
+  };
 
   const [currentDateTime, setCurrentDateTime] = useState<string>("");
 
@@ -117,20 +128,66 @@ export function ProfessionalDashboard() {
     (c) => c.status === "Confirmado" || c.status === "Em Andamento"
   );
 
-  const professionalNavLinks = [
-    { path: "/dashboard-profissional", label: "Início", icon: "fa-home" },
-    { path: "/agenda", label: "Agenda", icon: "fa-calendar-alt" },
-    { path: "/pacientes", label: "Pacientes", icon: "fa-users" },
-    { path: "/prontuarios", label: "Prontuários", icon: "fa-file-medical" },
-];
+  // Função para alterar um campo de um medicamento específico
+  const handleMedicamentoChange = (index: number, field: string, value: string) => {
+    const novosMedicamentos = [...medicamentos];
+    novosMedicamentos[index] = { ...novosMedicamentos[index], [field]: value };
+    setMedicamentos(novosMedicamentos);
+  };
+
+  // Função para adicionar um novo campo de medicamento à lista
+  const addMedicamento = () => {
+    setMedicamentos([...medicamentos, { nome: '', dosagem: '', obs: '' }]);
+  };
+
+  // Função para remover um campo de medicamento da lista
+  const removeMedicamento = (index: number) => {
+    const novosMedicamentos = medicamentos.filter((_, i) => i !== index);
+    setMedicamentos(novosMedicamentos);
+  };
+
+  const handleProntuarioSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const novoProntuario = {
+      pacienteId: formPacienteId,
+      tipo: formTipoConsulta,
+      queixa: formQueixa,
+      sinaisVitais: formSinaisVitais,
+      exameFisico: formExameFisico,
+      hipotese: formHipotese,
+    };
+
+    console.log("Novo Prontuário Salvo:", novoProntuario);
+    alert(`Prontuário para o paciente ID ${formPacienteId} salvo com sucesso!`);
+
+    // Limpa todos os campos do formulário
+    setFormPacienteId('');
+    setFormTipoConsulta('consulta');
+    setFormQueixa('');
+    setFormSinaisVitais({ pa: '', fc: '', peso: '', temp: '' });
+    setFormExameFisico('');
+    setFormHipotese('');
+    closeProntuarioModal();
+  };
+
+  // --- ADICIONE ESTE BLOCO PARA O MODAL DE PRESCRIÇÃO ---
+  const [isPrescricaoModalOpen, setIsPrescricaoModalOpen] = useState(false);
+  const [prescricaoPacienteId, setPrescricaoPacienteId] = useState('');
+  const [medicamentos, setMedicamentos] = useState([{ nome: '', dosagem: '', obs: '' }]);
+
+  const openPrescricaoModal = () => setIsPrescricaoModalOpen(true);
+  const closePrescricaoModal = () => {
+    setIsPrescricaoModalOpen(false);
+    // Limpa o formulário ao fechar
+    setPrescricaoPacienteId('');
+    setMedicamentos([{ nome: '', dosagem: '', obs: '' }]);
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* HEADER */}
-      <Header
-        userName={mockData.medico.nome}
-        userAvatarUrl={mockData.medico.avatar} 
-        navLinks={professionalNavLinks}/>
+      <Header />
 
       <main className="container mx-auto p-6">
         {/* WELCOME */}
@@ -173,9 +230,9 @@ export function ProfessionalDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Agenda */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-bolt mr-2"></i>Ações Rápidas
-              </div>
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+              <i className="fas fa-bolt mr-2"></i>Ações Rápidas
+            </div>
             <div className="p-6 max-h-96 overflow-y-auto">
               {mockData.agendaHoje.map((c) => (
                 <div
@@ -196,9 +253,9 @@ export function ProfessionalDashboard() {
 
           {/* Pacientes Prioritários */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-user-injured mr-2"></i>Pacientes Prioritários
-              </div>
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+              <i className="fas fa-user-injured mr-2"></i>Pacientes Prioritários
+            </div>
             <div className="p-3 space-y-4 max-h-96 overflow-y-auto">
               {mockData.pacientesPrioritarios.map((p) => (
                 <div key={p.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
@@ -244,7 +301,7 @@ export function ProfessionalDashboard() {
 
                 <a
                   href="#"
-                  onClick={() => alert("Abrir modal de prescrição...")}
+                  onClick={openPrescricaoModal}
                   className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
                 >
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
@@ -266,7 +323,7 @@ export function ProfessionalDashboard() {
 
                 <a
                   href="#"
-                  onClick={() => alert("Telemedicina em breve...")}
+                  onClick={(e) => { e.preventDefault(); navigate('/telemedicina'); }}
                   className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
                 >
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
@@ -343,59 +400,62 @@ export function ProfessionalDashboard() {
         title="Atendimento - Novo Prontuário"
         size="5xl"
       >
-        <form onSubmit={(e) => { e.preventDefault(); alert(`Prontuário salvo para o paciente: ${formPaciente} com a queixa: ${formQueixa}`); closeProntuarioModal(); setFormPaciente(''); setFormQueixa('');setFormExameFisico(''); setFormHipotese(''); }}>
-          {/* Linha 1: Paciente, Tipo, Data */}
+        <form onSubmit={handleProntuarioSubmit}>
+          {/* Linha 1 */}
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
             <div className="md:col-span-3">
               <label htmlFor="pacienteProntuario" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-user mr-2 text-gray-400"></i>Paciente
               </label>
-              <select id="pacienteProntuario" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" value={formPaciente}
-                onChange={(e) => setFormPaciente(e.target.value)} required >
+              <select id="pacienteProntuario" className="w-full p-2 border border-gray-300 rounded-md"
+                value={formPacienteId} onChange={(e) => setFormPacienteId(e.target.value)} required>
                 <option value="">Selecione um paciente</option>
                 <option value="1">Carlos Santos - 39 anos</option>
                 <option value="2">Maria Oliveira - 52 anos</option>
-                <option value="3">João Silva - 28 anos</option>
                 <option value="4">Ana Costa - 65 anos</option>
-                <option value="5">Pedro Lima - 45 anos</option>
               </select>
             </div>
             <div className="md:col-span-1">
               <label htmlFor="tipoConsulta" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-stethoscope mr-2 text-gray-400"></i>Tipo
               </label>
-              <select id="tipoConsulta" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+              <select id="tipoConsulta" className="w-full p-2 border border-gray-300 rounded-md"
+                value={formTipoConsulta} onChange={(e) => setFormTipoConsulta(e.target.value)}>
                 <option value="consulta">Consulta</option>
                 <option value="retorno">Retorno</option>
                 <option value="emergencia">Emergência</option>
-                <option value="exame">Exame</option>
               </select>
             </div>
             <div className="md:col-span-2">
               <label htmlFor="dataAtendimento" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-calendar mr-2 text-gray-400"></i>Data/Hora
               </label>
-              <input type="datetime-local" id="dataAtendimento" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required />
+              <input type="datetime-local" id="dataAtendimento" className="w-full p-2 border border-gray-300 rounded-md" required />
             </div>
           </div>
 
-          {/* Linha 2: Queixa e Sinais Vitais */}
+          {/* Linha 2 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
             <div>
               <label htmlFor="queixaPrincipal" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-comment-medical mr-2 text-gray-400"></i>Queixa Principal
               </label>
-              <textarea id="queixaPrincipal" rows={5} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva a queixa principal do paciente..." value={formQueixa} onChange={(e) => setFormQueixa(e.target.value)}></textarea>
+              <textarea id="queixaPrincipal" rows={5} className="w-full p-2 border border-gray-300 rounded-md" placeholder="Descreva a queixa..."
+                value={formQueixa} onChange={(e) => setFormQueixa(e.target.value)}></textarea>
             </div>
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-heartbeat mr-2 text-gray-400"></i>Sinais Vitais
               </label>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <input type="text" placeholder="PA (mmHg)" className="w-full p-2 border border-gray-300 rounded-md" />
-                <input type="text" placeholder="FC (bpm)" className="w-full p-2 border border-gray-300 rounded-md" />
-                <input type="text" placeholder="Peso (kg)" className="w-full p-2 border border-gray-300 rounded-md" />
-                <input type="text" placeholder="Temp (°C)" className="w-full p-2 border border-gray-300 rounded-md" />
+                <input type="text" placeholder="PA (mmHg)" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formSinaisVitais.pa} onChange={(e) => setFormSinaisVitais({ ...formSinaisVitais, pa: e.target.value })} />
+                <input type="text" placeholder="FC (bpm)" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formSinaisVitais.fc} onChange={(e) => setFormSinaisVitais({ ...formSinaisVitais, fc: e.target.value })} />
+                <input type="text" placeholder="Peso (kg)" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formSinaisVitais.peso} onChange={(e) => setFormSinaisVitais({ ...formSinaisVitais, peso: e.target.value })} />
+                <input type="text" placeholder="Temp (°C)" className="w-full p-2 border border-gray-300 rounded-md"
+                  value={formSinaisVitais.temp} onChange={(e) => setFormSinaisVitais({ ...formSinaisVitais, temp: e.target.value })} />
               </div>
             </div>
           </div>
@@ -406,27 +466,83 @@ export function ProfessionalDashboard() {
               <label htmlFor="exameFisico" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-search mr-2 text-gray-400"></i>Exame Físico
               </label>
-              <textarea id="exameFisico" rows={4} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva os achados do exame físico..." value={formExameFisico} onChange={(e) => setFormExameFisico(e.target.value)}></textarea>
+              <textarea id="exameFisico" rows={3} className="w-full p-2 border border-gray-300 rounded-md" placeholder="Descreva os achados..."
+                value={formExameFisico} onChange={(e) => setFormExameFisico(e.target.value)}></textarea>
             </div>
             <div>
               <label htmlFor="hipoteseDiagnostica" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                 <i className="fas fa-diagnoses mr-2 text-gray-400"></i>Hipótese Diagnóstica
               </label>
-              <textarea id="hipoteseDiagnostica" rows={3} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="CID-10 e descrição do diagnóstico..." value={formHipotese} onChange={(e) => setFormHipotese(e.target.value)}></textarea>
+              <textarea id="hipoteseDiagnostica" rows={3} className="w-full p-2 border border-gray-300 rounded-md" placeholder="CID-10 e descrição..."
+                value={formHipotese} onChange={(e) => setFormHipotese(e.target.value)}></textarea>
             </div>
           </div>
 
           {/* Botões */}
           <div className="mt-8 pt-4 border-t flex justify-end space-x-3">
-            <button type="button" onClick={closeProntuarioModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
-              <i className="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button type="button" onClick={() => alert('Rascunho salvo!')} className="px-4 py-2 bg-white border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors">
-              <i className="fas fa-save mr-2"></i>Salvar Rascunho
-            </button>
-            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity">
-              <i className="fas fa-check mr-2"></i>Finalizar Prontuário
-            </button>
+            <button type="button" onClick={closeProntuarioModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</button>
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">Finalizar Prontuário</button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* --- MODAL DE PRESCRIÇÃO --- */}
+      <Modal
+        isOpen={isPrescricaoModalOpen}
+        onClose={closePrescricaoModal}
+        title="Nova Prescrição Médica"
+        size="4xl"
+      >
+        <form onSubmit={(e) => { e.preventDefault(); console.log({paciente: prescricaoPacienteId, medicamentos}); alert('Prescrição Salva!'); closePrescricaoModal(); }}>
+          {/* Paciente e Validade */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label htmlFor="prescricaoPaciente" className="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+              <select id="prescricaoPaciente" className="w-full p-2 border border-gray-300 rounded-md" value={prescricaoPacienteId} onChange={(e) => setPrescricaoPacienteId(e.target.value)} required>
+                <option value="">Selecione um paciente</option>
+                <option value="1">Carlos Santos</option>
+                <option value="2">Maria Oliveira</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="validade" className="block text-sm font-medium text-gray-700 mb-1">Validade da Receita</label>
+              <input type="date" id="validade" className="w-full p-2 border border-gray-300 rounded-md" required />
+            </div>
+          </div>
+          
+          {/* Lista Dinâmica de Medicamentos */}
+          <div className="space-y-4">
+            {medicamentos.map((med, index) => (
+              <div key={index} className="bg-gray-50 p-4 rounded-lg border">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <input type="text" placeholder="Nome do medicamento" className="md:col-span-2 p-2 border border-gray-300 rounded-md" 
+                    value={med.nome} onChange={(e) => handleMedicamentoChange(index, 'nome', e.target.value)} />
+                  <input type="text" placeholder="Dosagem (ex: 50mg)" className="p-2 border border-gray-300 rounded-md" 
+                    value={med.dosagem} onChange={(e) => handleMedicamentoChange(index, 'dosagem', e.target.value)} />
+                </div>
+                <div className="mt-2 flex items-center gap-3">
+                  <textarea placeholder="Observações (ex: 1x ao dia por 7 dias)" rows={1} className="flex-grow p-2 border border-gray-300 rounded-md"
+                    value={med.obs} onChange={(e) => handleMedicamentoChange(index, 'obs', e.target.value)}></textarea>
+                  {/* Só mostra o botão de remover se houver mais de um medicamento */}
+                  {medicamentos.length > 1 && (
+                    <button type="button" onClick={() => removeMedicamento(index)} className="px-3 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Botão para adicionar mais medicamentos */}
+          <button type="button" onClick={addMedicamento} className="mt-4 text-sm font-semibold text-primary hover:text-red-700">
+            <i className="fas fa-plus mr-2"></i>Adicionar outro medicamento
+          </button>
+
+          {/* Botões do Footer */}
+          <div className="mt-8 pt-4 border-t flex justify-end space-x-3">
+            <button type="button" onClick={closePrescricaoModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</button>
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">Emitir Prescrição</button>
           </div>
         </form>
       </Modal>
