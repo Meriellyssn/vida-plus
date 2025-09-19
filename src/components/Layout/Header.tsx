@@ -1,8 +1,28 @@
-// src/components/Layout/Header.tsx
+/**
+ * Componente Header - Sistema Vida Plus
+ *
+ * Este componente representa o cabeçalho principal do sistema,
+ * exibido em todas as páginas após o login do usuário.
+ *
+ * Ele contém:
+ * - O logotipo e o nome da aplicação.
+ * - Um menu de navegação dinâmico que muda conforme o tipo de usuário
+ *   (paciente, profissional ou administrador).
+ * - Avatar, nome do usuário logado e botão de logout na versão desktop.
+ * - Um menu responsivo para dispositivos móveis (hambúrguer).
+ *
+ * O componente valida os dados do usuário a partir do localStorage
+ * e redireciona para a página de login caso não exista sessão ativa.
+ *
+ * @author Meirielli S. Sousa do N.
+ * @version 1.0.0
+ * @since 2025
+ */
+
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
-// --- NOVO: Definimos TODOS os menus possíveis em um só lugar ---
+// --- Configuração centralizada dos menus ---
 const navLinksConfig = {
   paciente: [
     { path: '/dashboard-paciente', label: 'Início', icon: 'fa-home' },
@@ -24,98 +44,141 @@ const navLinksConfig = {
   ],
 };
 
-// Interface para os dados do usuário que vamos ler da "sessão"
+// Tipagem do usuário logado
 interface CurrentUser {
   tipo: 'paciente' | 'profissional' | 'admin';
   nome: string;
   avatarUrl: string;
 }
 
-// --- O HEADER AGORA NÃO RECEBE MAIS PROPRIEDADES ---
 export function Header() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // NOVO: Estado para guardar as informações do usuário logado
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
-  // NOVO: Este efeito roda APENAS UMA VEZ quando o Header aparece na tela
+  // Carrega dados do usuário do localStorage
   useEffect(() => {
-    // 1. Buscamos os dados do usuário no localStorage (que salvamos no login)
     const userJson = localStorage.getItem('currentUser');
-
     if (userJson) {
-      // 2. Se encontrarmos, atualizamos nosso estado com os dados do usuário
-      setCurrentUser(JSON.parse(userJson));
+      try {
+        const parsedUser: CurrentUser = JSON.parse(userJson);
+        if (parsedUser?.tipo && parsedUser?.nome && parsedUser?.avatarUrl) {
+          setCurrentUser(parsedUser);
+        } else {
+          navigate('/');
+        }
+      } catch {
+        navigate('/');
+      }
     } else {
-      // 3. Se NÃO encontrarmos, redirecionamos para o login por segurança
       navigate('/');
     }
-  }, []); // O array vazio [] garante que isso rode só uma vez
+  }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('currentUser'); // Limpa a sessão
+    localStorage.removeItem('currentUser');
     navigate('/');
   };
 
-  // Se ainda não tivermos os dados do usuário, não mostramos nada para evitar erros
   if (!currentUser) {
     return null;
   }
 
-  // AQUI ESTÁ A MÁGICA: Escolhemos a lista de links correta com base no tipo do usuário
   const navLinks = navLinksConfig[currentUser.tipo];
+  const homePath = navLinks[0].path; // Primeiro link sempre é "Início"
 
-  const homePath = 
-    currentUser.tipo === 'paciente' ? '/dashboard-paciente' :
-    currentUser.tipo === 'profissional' ? '/dashboard-profissional' :
-    '/dashboard-admin';
-
-  // O JSX do Header agora usa as variáveis 'currentUser' e 'navLinks'
   return (
     <header className="bg-gradient-to-r from-primary to-secondary text-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between py-3">
+          {/* Logo */}
           <NavLink to={homePath} className="text-2xl font-bold flex items-center">
-            <img src="/src/assets/logo-branca.png" alt="Logo VidaPlus Branca"
-              className="w-8 h-8 mr-2" />
+            <img
+              src="/src/assets/logo-branca.png"
+              alt="Logo VidaPlus Branca"
+              className="w-8 h-8 mr-2"
+            />
             <span>VidaPlus</span>
           </NavLink>
 
+          {/* Menu Desktop */}
           <ul className="hidden lg:flex items-center space-x-2">
             {navLinks.map((link) => (
               <li key={link.path}>
                 <NavLink
                   to={link.path}
                   className={({ isActive }) =>
-                    `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-white/20' : 'hover:bg-white/10'
+                    `flex items-center px-4 py-2 rounded-lg transition-colors ${
+                      isActive ? 'bg-white/20' : 'hover:bg-white/10'
                     }`
                   }
                 >
-                  <i className={`fas ${link.icon} mr-2`}></i>{link.label}
+                  <i className={`fas ${link.icon} mr-2`}></i>
+                  {link.label}
                 </NavLink>
               </li>
             ))}
           </ul>
 
+          {/* Usuário + Logout Desktop */}
           <div className="hidden lg:flex items-center space-x-2">
-            <img src={currentUser.avatarUrl} alt="Avatar" className="w-9 h-9 rounded-full border-2 border-white/50" />
+            <img
+              src={currentUser.avatarUrl}
+              alt="Avatar do usuário"
+              className="w-9 h-9 rounded-full border-2 border-white/50"
+            />
             <span>{currentUser.nome}</span>
-            <button onClick={handleLogout} className="ml-4 bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-lg text-sm">
+            <button
+              onClick={handleLogout}
+              className="ml-4 bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-lg text-sm"
+              aria-label="Sair do sistema"
+            >
               <i className="fas fa-sign-out-alt mr-1"></i>Sair
             </button>
           </div>
 
+          {/* Botão menu mobile */}
           <div className="lg:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-2xl">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-2xl"
+              aria-label="Abrir menu"
+            >
               <i className="fas fa-bars"></i>
             </button>
           </div>
         </nav>
 
+        {/* Menu Mobile */}
         {isMenuOpen && (
-          <div className="lg:hidden mt-2 pb-4">
-            {/* ... (o menu mobile que já fizemos, ele vai funcionar automaticamente) ... */}
+          <div className="lg:hidden mt-2 pb-4 space-y-2">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className="flex items-center px-4 py-2 rounded-lg hover:bg-white/10"
+                onClick={() => setIsMenuOpen(false)} // Fecha menu ao clicar
+              >
+                <i className={`fas ${link.icon} mr-2`}></i>
+                {link.label}
+              </NavLink>
+            ))}
+
+            <div className="flex items-center px-4 mt-3">
+              <img
+                src={currentUser.avatarUrl}
+                alt="Avatar do usuário"
+                className="w-8 h-8 rounded-full border-2 border-white/50 mr-2"
+              />
+              <span>{currentUser.nome}</span>
+              <button
+                onClick={handleLogout}
+                className="ml-auto bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-lg text-sm"
+                aria-label="Sair do sistema"
+              >
+                <i className="fas fa-sign-out-alt mr-1"></i>Sair
+              </button>
+            </div>
           </div>
         )}
       </div>
