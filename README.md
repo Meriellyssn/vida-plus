@@ -84,7 +84,7 @@ vida-plus/
 
 ## 👩‍💻 Autora
 
-**Meirielly Silva Sousa do Nascimento**
+**Meirielli Silva Sousa do Nascimento**
 📌 Projeto desenvolvido como parte da disciplina de **Análise e Desenvolvimento de Sistemas**.
 
 ---
