@@ -1,10 +1,35 @@
+/**
+ * Dashboard do Paciente - Sistema Vida Plus
+ *
+ * Este componente representa a área pessoal do paciente, onde ele pode
+ * visualizar suas informações de saúde, gerenciar consultas, acessar
+ * seu histórico médico e visualizar receitas ativas.
+ *
+ * Funcionalidades principais:
+ * - Apresenta um resumo de saúde com métricas importantes (KPIs).
+ * - Exibe uma lista detalhada de consultas futuras.
+ * - Fornece acesso ao histórico de consultas e exames passados.
+ * - Lista as receitas médicas ativas com suas respectivas dosagens e validades.
+ * - Permite o agendamento de novas consultas através de um formulário em modal.
+ * - Interface amigável com um banner de boas-vindas e relógio digital.
+ *
+ * @author Meirielli S. Sousa do N.
+ * @version 1.0.0
+ * @since 2025
+ */
+
+// --- Importações ---
 import { useState, useEffect } from 'react';
 import { Header } from '../../components/Layout/Header';
 import { StatCard } from '../../components/Dashboard/StatCard';
 import { ActionCard } from '../../components/Dashboard/ActionCard';
 import { Modal } from '../../components/common/Modal';
 
-// Dados simulados, exatamente como no seu protótipo
+// --- Dados Simulados (Mock Data) ---
+/**
+ * Objeto com dados simulados para um paciente específico.
+ * Inclui informações pessoais, agendamentos, histórico de saúde e receitas.
+ */
 const mockData = {
   paciente: {
     id: 3,
@@ -16,106 +41,31 @@ const mockData = {
     endereco: 'Rua das Flores, 123, São Paulo - SP'
   },
   consultas: [
-    {
-      id: 1,
-      data: '2025-12-08',
-      hora: '14:30',
-      medico: 'Dra. Maria Silva',
-      especialidade: 'Cardiologia',
-      status: 'confirmed',
-      local: 'Hospital VidaPlus - Unidade Central',
-      tipo: 'Consulta de rotina'
-    },
-    {
-      id: 2,
-      data: '2025-09-05',
-      hora: '10:00',
-      medico: 'Dr. João Pedro',
-      especialidade: 'Dermatologia',
-      status: 'pending',
-      local: 'Clínica VidaPlus - Jardins',
-      tipo: 'Avaliação dermatológica'
-    },
-    {
-      id: 3,
-      data: '2025-08-20',
-      hora: '16:00',
-      medico: 'Dr. Roberto Lima',
-      especialidade: 'Clínica Geral',
-      status: 'completed',
-      local: 'Hospital VidaPlus - Unidade Central',
-      tipo: 'Check-up geral'
-    },
-    {
-      id: 4,
-      data: '2025-08-15',
-      hora: '09:30',
-      medico: 'Dra. Ana Costa',
-      especialidade: 'Oftalmologia',
-      status: 'completed',
-      local: 'Clínica VidaPlus - Centro',
-      tipo: 'Exame oftalmológico'
-    }
+    { id: 1, data: '2025-12-08', hora: '14:30', medico: 'Dra. Maria Silva', especialidade: 'Cardiologia', status: 'confirmed', local: 'Hospital VidaPlus - Unidade Central', tipo: 'Consulta de rotina' },
+    { id: 2, data: '2025-09-30', hora: '10:00', medico: 'Dr. João Pedro', especialidade: 'Dermatologia', status: 'pending', local: 'Clínica VidaPlus - Jardins', tipo: 'Avaliação dermatológica' },
+    { id: 3, data: '2025-08-20', hora: '16:00', medico: 'Dr. Roberto Lima', especialidade: 'Clínica Geral', status: 'completed', local: 'Hospital VidaPlus - Unidade Central', tipo: 'Check-up geral' },
+    { id: 4, data: '2025-08-15', hora: '09:30', medico: 'Dra. Ana Costa', especialidade: 'Oftalmologia', status: 'completed', local: 'Clínica VidaPlus - Centro', tipo: 'Exame oftalmológico' }
   ],
   historico: [
-    {
-      data: '2025-08-20',
-      tipo: 'Consulta',
-      descricao: 'Check-up geral - Clínica Geral',
-      medico: 'Dr. Roberto Lima',
-      resultado: 'Paciente em boas condições de saúde'
-    },
-    {
-      data: '2025-08-15',
-      tipo: 'Exame',
-      descricao: 'Hemograma Completo',
-      medico: null,
-      resultado: 'Todos os parâmetros dentro dos valores normais'
-    },
-    {
-      data: '2025-08-10',
-      tipo: 'Consulta',
-      descricao: 'Cardiologia - Avaliação preventiva',
-      medico: 'Dra. Maria Silva',
-      resultado: 'Recomendada atividade física regular e dieta balanceada'
-    },
-    {
-      data: '2025-07-25',
-      tipo: 'Exame',
-      descricao: 'Exame oftalmológico',
-      medico: null,
-      resultado: 'Visão 20/20, sem necessidade de correção'
-    }
+    { data: '2025-08-20', tipo: 'Consulta', descricao: 'Check-up geral - Clínica Geral', medico: 'Dr. Roberto Lima', resultado: 'Paciente em boas condições de saúde' },
+    { data: '2025-08-15', tipo: 'Exame', descricao: 'Hemograma Completo', medico: null, resultado: 'Todos os parâmetros dentro dos valores normais' },
+    { data: '2025-08-10', tipo: 'Consulta', descricao: 'Cardiologia - Avaliação preventiva', medico: 'Dra. Maria Silva', resultado: 'Recomendada atividade física regular e dieta balanceada' },
+    { data: '2025-07-25', tipo: 'Exame', descricao: 'Exame oftalmológico', medico: null, resultado: 'Visão 20/20, sem necessidade de correção' }
   ],
   receitas: [
-    {
-      id: 1,
-      medicamento: 'Losartana 50mg',
-      dosagem: '1 comprimido ao dia pela manhã',
-      validade: '2025-12-20',
-      medico: 'Dra. Maria Silva',
-      observacoes: 'Tomar com o estômago vazio'
-    },
-    {
-      id: 2,
-      medicamento: 'Vitamina D3 2000UI',
-      dosagem: '1 cápsula por semana',
-      validade: '2025-10-15',
-      medico: 'Dr. Roberto Lima',
-      observacoes: 'Tomar preferencialmente após o almoço'
-    },
-    {
-      id: 3,
-      medicamento: 'Ômega 3 1000mg',
-      dosagem: '1 cápsula 2x ao dia',
-      validade: '2025-11-30',
-      medico: 'Dra. Maria Silva',
-      observacoes: 'Tomar junto com as refeições'
-    }
+    { id: 1, medicamento: 'Losartana 50mg', dosagem: '1 comprimido ao dia pela manhã', validade: '2025-12-20', medico: 'Dra. Maria Silva', observacoes: 'Tomar com o estômago vazio' },
+    { id: 2, medicamento: 'Vitamina D3 2000UI', dosagem: '1 cápsula por semana', validade: '2025-10-15', medico: 'Dr. Roberto Lima', observacoes: 'Tomar preferencialmente após o almoço' },
+    { id: 3, medicamento: 'Ômega 3 1000mg', dosagem: '1 cápsula 2x ao dia', validade: '2025-11-30', medico: 'Dra. Maria Silva', observacoes: 'Tomar junto com as refeições' }
   ]
 };
 
-// Função para formatar a data como "02/Set"
+// --- Funções Utilitárias ---
+/**
+ * Formata uma string de data (AAAA-MM-DD) para um objeto com dia e mês abreviado.
+ * Exemplo: '2025-09-02' => { day: '02', month: 'set' }
+ * @param {string} dateString - A data no formato 'AAAA-MM-DD'.
+ * @returns {{day: string, month: string}} Objeto com dia e mês formatados.
+ */
 const formatAppointmentDate = (dateString: string) => {
   const date = new Date(dateString);
   const day = date.getUTCDate().toString().padStart(2, '0');
@@ -124,18 +74,15 @@ const formatAppointmentDate = (dateString: string) => {
 };
 
 export function PatientDashboard() {
+  // --- Gerenciamento de Estado do Componente ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  const handleScheduleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Sua consulta foi solicitada com sucesso! (Simulação)');
-    closeModal();
-  };
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  /**
+   * Efeito para criar um relógio digital que atualiza a cada segundo.
+   * Utiliza setInterval para atualizar o estado `currentTime` e
+   * clearInterval para limpar o timer quando o componente é desmontado.
+   */
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -146,30 +93,51 @@ export function PatientDashboard() {
     };
   }, []);
 
-  const formattedDate = currentTime.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-  const formattedTime = currentTime.toLocaleTimeString('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-  const proximaConsulta = mockData.consultas.find(c => new Date(c.data) >= new Date() && c.status !== 'completed');
-  const consultasFuturas = mockData.consultas.filter(c => new Date(c.data) >= new Date() && c.status !== 'completed');
+  // --- Funções e Manipuladores de Eventos ---
+  /**
+   * Abre o modal de agendamento de consulta.
+   */
+  const openModal = () => setIsModalOpen(true);
 
+  /**
+   * Fecha o modal de agendamento de consulta.
+   */
+  const closeModal = () => setIsModalOpen(false);
+
+  /**
+   * Manipula o envio do formulário de agendamento (simulação).
+   * @param {React.FormEvent} e - O evento do formulário.
+   */
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert('Sua consulta foi solicitada com sucesso! (Simulação)');
+    closeModal();
+  };
+
+  /**
+   * Exibe um alerta para funcionalidades ainda não implementadas.
+   */
   const showNotImplemented = () => {
     alert("Funcionalidade ainda não implementada.");
   };
 
+  // --- Processamento de Dados e Constantes ---
+  // Formata a data e hora atuais para exibição no relógio
+  const formattedDate = currentTime.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const formattedTime = currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  // Filtra os dados para encontrar a próxima consulta e a lista de consultas futuras
+  const proximaConsulta = mockData.consultas.find(c => new Date(c.data) >= new Date() && c.status !== 'completed');
+  const consultasFuturas = mockData.consultas.filter(c => new Date(c.data) >= new Date() && c.status !== 'completed');
+
+  // --- Renderização do Componente ---
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header/>
+      <Header />
 
       <main className="container mx-auto p-4 md:p-8">
+        {/* SEÇÃO DE BOAS-VINDAS E RELÓGIO */}
         <div className="bg-gradient-to-r from-primary to-secondary text-white p-8 rounded-2xl shadow-lg flex items-center justify-between mb-8">
-          {/* Coluna da Esquerda: Texto */}
           <div>
             <h1 className="text-3xl font-bold">Olá, {mockData.paciente.nome}! 👋</h1>
             <p className="mt-2 opacity-90 max-w-lg">Bem-vindo ao seu painel de saúde. Aqui você pode acompanhar suas consultas, exames e manter sua saúde sempre em dia.</p>
@@ -180,7 +148,6 @@ export function PatientDashboard() {
               </p>
             )}
           </div>
-          {/* Coluna da Direita: Relógio Digital */}
           <div className="text-right hidden lg:block">
             <div className="text-3xl font-bold">{formattedTime}</div>
             <div className="text-sm opacity-90 capitalize">{formattedDate}</div>
@@ -188,6 +155,7 @@ export function PatientDashboard() {
           </div>
         </div>
 
+        {/* SEÇÃO DE MÉTRICAS RÁPIDAS (STAT CARDS) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard icon="fa-calendar-check" value={consultasFuturas.length} label="Próximas Consultas" />
           <StatCard icon="fa-file-medical-alt" value={mockData.consultas.length} label="Total de Consultas" />
@@ -195,15 +163,13 @@ export function PatientDashboard() {
           <StatCard icon="fa-prescription-bottle-alt" value={mockData.receitas.length} label="Receitas Ativas" />
         </div>
 
+        {/* GRID PRINCIPAL DO CONTEÚDO */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Coluna Esquerda: Ações e Histórico */}
           <div className="lg:col-span-1 space-y-8">
-            {/* Ações Rápidas */}
+            {/* Card: Ações Rápidas */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              {/* Cabeçalho do Card */}
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-bolt mr-2"></i>Ações Rápidas
-              </div>
-              {/* Corpo do Card */}
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-bolt mr-2"></i>Ações Rápidas</div>
               <div className="p-6">
                 <div className="grid grid-cols-2 gap-4">
                   <ActionCard icon="fa-plus" title="Agendar Consulta" onClick={openModal} />
@@ -213,22 +179,17 @@ export function PatientDashboard() {
                 </div>
               </div>
             </div>
-            {/* Histórico Recente */}
+
+            {/* Card: Histórico Recente */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              {/* Cabeçalho do Card */}
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-history mr-2"></i>Histórico Recente
-              </div>
-              {/* Corpo do Card */}
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-history mr-2"></i>Histórico Recente</div>
               <div className="p-6 space-y-3">
                 {mockData.historico.map((item, index) => (
                   <div key={index} className="border-l-4 border-primary/50 pl-3">
                     <p className="font-bold text-gray-700">{item.descricao}</p>
                     <p className="text-sm text-gray-500">{new Date(item.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} {item.medico ? `• ${item.medico}` : ''}</p>
                     {item.resultado && (
-                      <p className="text-sm text-gray-600 mt-1 bg-gray-100 p-2 rounded-md">
-                        <strong className="text-primary">Resultado:</strong> {item.resultado}
-                      </p>
+                      <p className="text-sm text-gray-600 mt-1 bg-gray-100 p-2 rounded-md"><strong className="text-primary">Resultado:</strong> {item.resultado}</p>
                     )}
                   </div>
                 ))}
@@ -236,16 +197,13 @@ export function PatientDashboard() {
             </div>
           </div>
 
+          {/* Coluna Direita: Consultas e Receitas */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Próximas Consultas */}
+            {/* Card: Próximas Consultas */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              {/* Cabeçalho do Card */}
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-calendar-alt mr-2"></i>Histórico Recente
-              </div>
-              {/* Corpo do Card */}
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-calendar-alt mr-2"></i>Próximas Consultas</div>
               <div className="p-6 space-y-3">
-                {mockData.consultas.filter(c => c.status !== 'completed').map((consulta) => {
+                {consultasFuturas.map((consulta) => {
                   const { day, month } = formatAppointmentDate(consulta.data);
                   return (
                     <div key={consulta.id} className="bg-gray-50 p-4 rounded-lg flex items-center space-x-4">
@@ -270,13 +228,10 @@ export function PatientDashboard() {
                 })}
               </div>
             </div>
-            {/* Receitas Ativas */}
+
+            {/* Card: Receitas Ativas */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              {/* Cabeçalho do Card */}
-              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-                <i className="fas fa-prescription-bottle-alt mr-2"></i>Receitas Ativas
-              </div>
-              {/* Corpo do Card */}
+              <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-prescription-bottle-alt mr-2"></i>Receitas Ativas</div>
               <div className="p-6 space-y-3">
                 {mockData.receitas.map(receita => (
                   <div key={receita.id} className="border-l-4 border-green-500/50 pl-3">
@@ -284,9 +239,7 @@ export function PatientDashboard() {
                     <p className="text-sm text-gray-600">{receita.dosagem}</p>
                     <p className="text-sm text-gray-500">Válida até: {new Date(receita.validade).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} • {receita.medico}</p>
                     {receita.observacoes && (
-                      <p className="text-sm text-blue-700 mt-1 bg-blue-50 p-2 rounded-md">
-                        <i className="fas fa-info-circle mr-2"></i>{receita.observacoes}
-                      </p>
+                      <p className="text-sm text-blue-700 mt-1 bg-blue-50 p-2 rounded-md"><i className="fas fa-info-circle mr-2"></i>{receita.observacoes}</p>
                     )}
                   </div>
                 ))}
@@ -295,11 +248,9 @@ export function PatientDashboard() {
           </div>
         </div>
       </main>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title="Agendar Nova Consulta"
-      >
+
+      {/* MODAL PARA AGENDAMENTO DE CONSULTA */}
+      <Modal isOpen={isModalOpen} onClose={closeModal} title="Agendar Nova Consulta">
         <form onSubmit={handleScheduleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -322,7 +273,6 @@ export function PatientDashboard() {
               <input type="date" id="dataConsulta" className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
               <label htmlFor="turno" className="block text-sm font-medium text-gray-700 mb-1">Turno</label>
@@ -340,19 +290,13 @@ export function PatientDashboard() {
               </select>
             </div>
           </div>
-
           <div className="mt-4">
             <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700 mb-1">Observações (Opcional)</label>
             <textarea id="observacoes" rows={3} className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Descreva brevemente o motivo da consulta..."></textarea>
           </div>
-
           <div className="mt-6 flex justify-end space-x-3">
-            <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
-              <i className="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity">
-              <i className="fas fa-calendar-check mr-2"></i>Agendar Consulta
-            </button>
+            <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"><i className="fas fa-times mr-2"></i>Cancelar</button>
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"><i className="fas fa-calendar-check mr-2"></i>Agendar Consulta</button>
           </div>
         </form>
       </Modal>
