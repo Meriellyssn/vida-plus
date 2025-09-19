@@ -8,7 +8,7 @@
  * O modal recebe um título, conteúdo (children), controle de abertura
  * e fechamento, e um tamanho opcional.
  *
- * @author Meirielly Silva
+ * @author Meirielli S. Sousa do N.
  * @version 1.0.0
  * @since 2025
  */
