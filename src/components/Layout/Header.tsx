@@ -40,6 +40,7 @@ const navLinksConfig = {
   admin: [
     { path: '/dashboard-admin', label: 'Início', icon: 'fa-home' },
     { path: '/usuarios', label: 'Usuários', icon: 'fa-users' },
+    { path: '/leitos', label: 'Leitos', icon: 'fa-bed' },
     { path: '/relatorios', label: 'Relatórios', icon: 'fa-chart-bar' },
     { path: '/sistema', label: 'Sistema', icon: 'fa-cog' },
   ],

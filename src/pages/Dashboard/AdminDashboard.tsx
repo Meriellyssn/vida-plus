@@ -51,6 +51,18 @@ const mockAdminData = {
     { id: 1, tipo: 'warning', titulo: 'Uso de CPU Alto', descricao: 'O servidor está com 87% de uso de CPU.', timestamp: '20 min atrás' },
     { id: 2, tipo: 'info', titulo: 'Manutenção Programada', descricao: 'Manutenção do banco de dados agendada para domingo às 02:00.', timestamp: '2h atrás' },
     { id: 3, tipo: 'success', titulo: 'Backup Concluído', descricao: 'Backup diário realizado com sucesso.', timestamp: '8h atrás' }
+  ],
+  leitos: [
+    { id: 1, setor: 'UTI Adulto', total: 20, ocupados: 18, status: 'Crítico' },
+    { id: 2, setor: 'Enfermaria Clínica', total: 50, ocupados: 35, status: 'Normal' },
+    { id: 3, setor: 'Cardiologia', total: 30, ocupados: 29, status: 'Alerta' },
+    { id: 4, setor: 'Pediatria', total: 25, ocupados: 15, status: 'Normal' },
+  ],
+  suprimentos: [
+    { id: 1, item: 'Máscaras N95', quantidade: 500, status: 'Baixo' },
+    { id: 2, item: 'Luvas Descartáveis (M)', quantidade: 8000, status: 'OK' },
+    { id: 3, item: 'Seringas 10ml', quantidade: 250, status: 'Crítico' },
+    { id: 4, item: 'Álcool em Gel (Litro)', quantidade: 150, status: 'OK' },
   ]
 };
 
@@ -256,8 +268,10 @@ export function AdminDashboard() {
         </div>
 
         {/* SEÇÃO DE KPIS (INDICADORES CHAVE) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           <KpiCard icon="fa-user-injured" value="2.847" label="Total de Pacientes" trend="+12% este mês" trendDirection="up" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
+          <KpiCard icon="fa-procedures" value="89%" label="Ocupação Leitos" trend="Alerta" trendDirection="stable" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
+          <KpiCard icon="fa-box-tissue" value="2%" label="Suprimentos Críticos" trend="Revisar" trendDirection="down" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
           <KpiCard icon="fa-user-md" value="87" label="Profissionais Ativos" trend="+3 novos" trendDirection="up" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
           <KpiCard icon="fa-calendar-check" value="1.653" label="Consultas este Mês" trend="+8% vs mês anterior" trendDirection="up" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
           <KpiCard icon="fa-dollar-sign" value="R$ 284k" label="Receita Mensal" trend="+15% crescimento" trendDirection="up" iconBgClass="bg-gradient-to-br from-primary to-secondary" />
@@ -316,7 +330,62 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* SEGUNDA LINHA DE CONTEÚDO (TABELAS E LOGS) */}
+        {/* --- SEGUNDA LINHA DE CONTEÚDO (LEITOS E SUPRIMENTOS) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          {/* Card de Ocupação de Leitos */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+              <i className="fas fa-bed mr-2"></i>Ocupação de Leitos
+            </div>
+            <div className="p-6 space-y-4">
+              {mockAdminData.leitos.map(leito => {
+                const ocupacaoPercent = (leito.ocupados / leito.total) * 100;
+                const statusColors = {
+                    'Crítico': 'bg-red-500',
+                    'Alerta': 'bg-yellow-500',
+                    'Normal': 'bg-green-500',
+                };
+                return (
+                  <div key={leito.id}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-semibold text-gray-700">{leito.setor}</span>
+                      <span className="text-sm text-gray-500">{leito.ocupados} / {leito.total}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className={`${statusColors[leito.status as keyof typeof statusColors]} h-2.5 rounded-full`} style={{ width: `${ocupacaoPercent}%` }}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Card de Controle de Suprimentos */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
+              <i className="fas fa-boxes mr-2"></i>Controle de Suprimentos
+            </div>
+            <div className="p-6 space-y-3">
+              {mockAdminData.suprimentos.map(item => (
+                <div key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-gray-800">{item.item}</p>
+                    <p className="text-sm text-gray-500">Quantidade: {item.quantidade}</p>
+                  </div>
+                  <span className={`text-xs font-bold py-1 px-3 rounded-full ${
+                    item.status === 'Crítico' ? 'bg-red-100 text-red-700' :
+                    item.status === 'Baixo' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-green-100 text-green-700'
+                  }`}>
+                    {item.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* TERCEIRA LINHA DE CONTEÚDO (USUÁRIOS E ATIVIDADE SISTEMA) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
           {/* Card: Tabela de Usuários Recentes */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
@@ -375,7 +444,7 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* TERCEIRA LINHA DE CONTEÚDO (PERFORMANCE E ALERTAS) */}
+        {/* QUARTA LINHA DE CONTEÚDO (PERFORMANCE E ALERTAS) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
           {/* Card: Gráfico de Performance do Sistema */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
