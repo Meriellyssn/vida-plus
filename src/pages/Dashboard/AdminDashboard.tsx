@@ -53,10 +53,10 @@ const mockAdminData = {
     { id: 3, tipo: 'success', titulo: 'Backup Concluído', descricao: 'Backup diário realizado com sucesso.', timestamp: '8h atrás' }
   ],
   leitos: [
-    { id: 1, setor: 'UTI Adulto', total: 20, ocupados: 18, status: 'Crítico' },
-    { id: 2, setor: 'Enfermaria Clínica', total: 50, ocupados: 35, status: 'Normal' },
-    { id: 3, setor: 'Cardiologia', total: 30, ocupados: 29, status: 'Alerta' },
-    { id: 4, setor: 'Pediatria', total: 25, ocupados: 15, status: 'Normal' },
+    { id: 1, setor: 'UTI Adulto', total: 200, ocupados: 180, status: 'Crítico' },
+    { id: 2, setor: 'Enfermaria Clínica', total: 500, ocupados: 350, status: 'Normal' },
+    { id: 3, setor: 'Cardiologia', total: 300, ocupados: 290, status: 'Alerta' },
+    { id: 4, setor: 'Pediatria', total: 250, ocupados: 150, status: 'Normal' },
   ],
   suprimentos: [
     { id: 1, item: 'Máscaras N95', quantidade: 500, status: 'Baixo' },
