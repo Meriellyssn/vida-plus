@@ -34,6 +34,7 @@ import { ReportsPage } from './pages/Admin/ReportsPage.tsx';
 import { LeitosPage } from './pages/Admin/LeitosPage.tsx';
 import { SistemPage } from './pages/Admin/SistemPage.tsx';
 import { AgendaPage } from './pages/Professional/AgendaPage.tsx';
+import { PacientesPage } from './pages/Professional/PacientesPage.tsx';
 import { AgendamentosPage } from './pages/Patient/AgendamentosPage.tsx';
 import { HistoricoPage } from './pages/Patient/HistoricoPage.tsx';
 
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
   { path: '/relatorios', element: <ReportsPage /> },
   { path: '/sistema', element: <SistemPage /> },
   { path: '/agenda', element: <AgendaPage /> },
+  {path: '/pacientes', element: <PacientesPage /> },
   { path: '/agendamentos', element: <AgendamentosPage /> },
   {path: '/historico', element: <HistoricoPage /> },
 
