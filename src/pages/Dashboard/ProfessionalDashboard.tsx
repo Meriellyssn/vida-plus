@@ -1,12 +1,30 @@
-// src/pages/Dashboard/ProfessionalDashboard.tsx
+/**
+ * Dashboard do Profissional - Sistema Vida Plus
+ *
+ * Este componente serve como o painel de controle principal para profissionais
+ * de saúde, como médicos e enfermeiros. Ele centraliza a agenda do dia,
+ * informações de pacientes, e ações rápidas para otimizar o fluxo de trabalho.
+ *
+ * Funcionalidades principais:
+ * - Exibição da agenda de consultas do dia com status em tempo real.
+ * - Lista de pacientes prioritários para atenção imediata.
+ * - Ações rápidas para criar prontuários, emitir prescrições e solicitar exames.
+ * - Feed de atividades recentes com um layout de linha do tempo (timeline).
+ * - Modais interativos para preenchimento de prontuário e prescrição de medicamentos.
+ *
+ * @author Meirielli S. Sousa do N.
+ * @version 1.0.0
+ * @since 2025
+ */
+
+// --- Importações ---
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "../../components/Layout/Header";
 import { StatCard } from "../../components/Dashboard/StatCard";
-import { QuickActionButton } from "../../components/Dashboard/QuickActionButton";
 import { Modal } from "../../components/common/Modal";
 
-// Tipos para dados simulados
+// --- Definições de Tipos (TypeScript) ---
 interface Consulta {
   id: number;
   hora: string;
@@ -35,14 +53,16 @@ interface Atividade {
   detalhes: string;
 }
 
-// MOCK DATA
+// --- Dados Simulados (Mock Data) ---
+/**
+ * Objeto com dados simulados para preencher o dashboard do profissional.
+ */
 const mockData = {
   medico: {
     nome: "Dra. Maria Silva",
     especialidade: "Cardiologia",
     crm: "12345-SP",
-    avatar:
-      "https://i.postimg.cc/rsj9f97v/16.png",
+    avatar: "https://i.postimg.cc/rsj9f97v/16.png",
   },
   agendaHoje: [
     { id: 1, hora: "08:00", paciente: "Carlos Santos", tipo: "Consulta", status: "Finalizado", idade: 39, queixa: "Dor no peito" },
@@ -68,13 +88,19 @@ const mockData = {
   ] as Atividade[],
 };
 
-// DICA DE ORGANIZAÇÃO: Mapa de estilos para a prioridade do paciente
+// --- Constantes de Estilo ---
+/**
+ * Mapeamento de níveis de prioridade para classes de estilo do Tailwind CSS.
+ */
 const priorityStyles: Record<Paciente['prioridade'], string> = {
   "Alto": "bg-red-100 text-red-700",
   "Médio": "bg-yellow-100 text-yellow-700",
   "Baixo": "bg-green-100 text-green-700",
 };
 
+/**
+ * Mapeamento de tipos de atividade para classes de estilo do Tailwind CSS.
+ */
 const activityTypeStyles: Record<Atividade['tipo'], string> = {
   "Consulta": "bg-green-100 text-green-700",
   "Receita": "bg-blue-100 text-blue-700",
@@ -84,6 +110,11 @@ const activityTypeStyles: Record<Atividade['tipo'], string> = {
 export function ProfessionalDashboard() {
   const navigate = useNavigate();
 
+  // --- Gerenciamento de Estado do Componente ---
+  // Estado para data e hora
+  const [currentDateTime, setCurrentDateTime] = useState<string>("");
+
+  // Estados para o Modal de Prontuário
   const [isProntuarioModalOpen, setIsProntuarioModalOpen] = useState(false);
   const [formPacienteId, setFormPacienteId] = useState('');
   const [formTipoConsulta, setFormTipoConsulta] = useState('consulta');
@@ -92,6 +123,36 @@ export function ProfessionalDashboard() {
   const [formExameFisico, setFormExameFisico] = useState('');
   const [formHipotese, setFormHipotese] = useState('');
 
+  // Estados para o Modal de Prescrição
+  const [isPrescricaoModalOpen, setIsPrescricaoModalOpen] = useState(false);
+  const [prescricaoPacienteId, setPrescricaoPacienteId] = useState('');
+  const [medicamentos, setMedicamentos] = useState([{ nome: '', dosagem: '', obs: '' }]);
+
+  // --- Efeitos (Lifecycle) ---
+  /**
+   * Efeito para atualizar a data e hora exibidas no painel a cada minuto.
+   */
+  useEffect(() => {
+    const updateDate = () => {
+      const now = new Date();
+      const options: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" };
+      const formattedDate = now.toLocaleDateString("pt-BR", options).replace(/(^\w{1})|(\s+\w{1})/g, (letra) => letra.toUpperCase());
+      setCurrentDateTime(formattedDate);
+    };
+    updateDate();
+    const interval = setInterval(updateDate, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- Processamento de Dados ---
+  /**
+   * Encontra a próxima consulta na agenda que está confirmada ou em andamento.
+   */
+  const proximaConsulta = mockData.agendaHoje.find(c => c.status === "Confirmado" || c.status === "Em Andamento");
+
+  // --- Funções e Manipuladores de Eventos ---
+
+  // Funções para o Modal de Prontuário
   const openProntuarioModal = () => setIsProntuarioModalOpen(true);
   const closeProntuarioModal = () => {
     setIsProntuarioModalOpen(false);
@@ -99,118 +160,78 @@ export function ProfessionalDashboard() {
     setFormPacienteId('');
     setFormTipoConsulta('consulta');
     setFormQueixa('');
+    setFormSinaisVitais({ pa: '', fc: '', peso: '', temp: '' });
+    setFormExameFisico('');
+    setFormHipotese('');
   };
 
-  const [currentDateTime, setCurrentDateTime] = useState<string>("");
+  /**
+   * Manipula o envio do formulário de prontuário (simulação).
+   */
+  const handleProntuarioSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const novoProntuario = { pacienteId: formPacienteId, tipo: formTipoConsulta, queixa: formQueixa, sinaisVitais: formSinaisVitais, exameFisico: formExameFisico, hipotese: formHipotese };
+    console.log("Novo Prontuário Salvo:", novoProntuario);
+    alert(`Prontuário para o paciente ID ${formPacienteId} salvo com sucesso!`);
+    closeProntuarioModal();
+  };
 
-  useEffect(() => {
-    const updateDate = () => {
-      const now = new Date();
-      const options: Intl.DateTimeFormatOptions = {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      setCurrentDateTime(
-        now
-          .toLocaleDateString("pt-BR", options)
-          .replace(/(^\w{1})|(\s+\w{1})/g, (letra) => letra.toUpperCase())
-      );
-    };
-    updateDate();
-    const interval = setInterval(updateDate, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  // Funções para o Modal de Prescrição
+  const openPrescricaoModal = () => setIsPrescricaoModalOpen(true);
+  const closePrescricaoModal = () => {
+    setIsPrescricaoModalOpen(false);
+    setPrescricaoPacienteId('');
+    setMedicamentos([{ nome: '', dosagem: '', obs: '' }]);
+  };
 
-  const proximaConsulta = mockData.agendaHoje.find(
-    (c) => c.status === "Confirmado" || c.status === "Em Andamento"
-  );
-
-  // Função para alterar um campo de um medicamento específico
+  /**
+   * Atualiza o estado de um medicamento específico na lista de prescrição.
+   * @param index A posição do medicamento no array.
+   * @param field O campo a ser alterado ('nome', 'dosagem', 'obs').
+   * @param value O novo valor do campo.
+   */
   const handleMedicamentoChange = (index: number, field: string, value: string) => {
     const novosMedicamentos = [...medicamentos];
     novosMedicamentos[index] = { ...novosMedicamentos[index], [field]: value };
     setMedicamentos(novosMedicamentos);
   };
 
-  // Função para adicionar um novo campo de medicamento à lista
+  /**
+   * Adiciona um novo campo de medicamento em branco ao formulário de prescrição.
+   */
   const addMedicamento = () => {
     setMedicamentos([...medicamentos, { nome: '', dosagem: '', obs: '' }]);
   };
 
-  // Função para remover um campo de medicamento da lista
+  /**
+   * Remove um campo de medicamento do formulário de prescrição.
+   * @param index A posição do medicamento a ser removido.
+   */
   const removeMedicamento = (index: number) => {
     const novosMedicamentos = medicamentos.filter((_, i) => i !== index);
     setMedicamentos(novosMedicamentos);
   };
 
-  const handleProntuarioSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const novoProntuario = {
-      pacienteId: formPacienteId,
-      tipo: formTipoConsulta,
-      queixa: formQueixa,
-      sinaisVitais: formSinaisVitais,
-      exameFisico: formExameFisico,
-      hipotese: formHipotese,
-    };
-
-    console.log("Novo Prontuário Salvo:", novoProntuario);
-    alert(`Prontuário para o paciente ID ${formPacienteId} salvo com sucesso!`);
-
-    // Limpa todos os campos do formulário
-    setFormPacienteId('');
-    setFormTipoConsulta('consulta');
-    setFormQueixa('');
-    setFormSinaisVitais({ pa: '', fc: '', peso: '', temp: '' });
-    setFormExameFisico('');
-    setFormHipotese('');
-    closeProntuarioModal();
-  };
-
-  // --- ADICIONE ESTE BLOCO PARA O MODAL DE PRESCRIÇÃO ---
-  const [isPrescricaoModalOpen, setIsPrescricaoModalOpen] = useState(false);
-  const [prescricaoPacienteId, setPrescricaoPacienteId] = useState('');
-  const [medicamentos, setMedicamentos] = useState([{ nome: '', dosagem: '', obs: '' }]);
-
-  const openPrescricaoModal = () => setIsPrescricaoModalOpen(true);
-  const closePrescricaoModal = () => {
-    setIsPrescricaoModalOpen(false);
-    // Limpa o formulário ao fechar
-    setPrescricaoPacienteId('');
-    setMedicamentos([{ nome: '', dosagem: '', obs: '' }]);
-  };
-
+  // --- Renderização do Componente ---
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* HEADER */}
       <Header />
 
       <main className="container mx-auto p-6">
-        {/* WELCOME */}
+        {/* SEÇÃO DE BOAS-VINDAS */}
         <div className="bg-gradient-to-r from-primary to-secondary text-white p-6 rounded-2xl shadow-lg mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            {/* Texto de boas-vindas */}
+            {/* Texto de boas-vindas e próxima consulta */}
             <div className="lg:col-span-2">
-              <h1 className="text-2xl font-bold">
-                Olá, {mockData.medico.nome}! 👩‍⚕️
-              </h1>
-              <p className="opacity-90">
-                Bem-vinda ao seu painel médico. Gerencie seus pacientes e consultas.
-              </p>
+              <h1 className="text-2xl font-bold">Olá, {mockData.medico.nome}! 👩‍⚕️</h1>
+              <p className="opacity-90">Bem-vinda ao seu painel médico. Gerencie seus pacientes e consultas.</p>
               {proximaConsulta && (
-                <p className="mt-3 font-semibold">
-                  <i className="fas fa-clock mr-2" />
-                  Próxima consulta: {proximaConsulta.hora} - {proximaConsulta.paciente}
-                </p>
+                <p className="mt-3 font-semibold"><i className="fas fa-clock mr-2" />Próxima consulta: {proximaConsulta.hora} - {proximaConsulta.paciente}</p>
               )}
             </div>
 
-            {/* Card do Médico */}
-            <div className="doctor-info bg-white/10 backdrop-blur-md rounded-lg p-4 text-center">
+            {/* Card com informações do profissional e data/hora */}
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 text-center">
               <div className="text-lg font-semibold">{mockData.medico.especialidade}</div>
               <div className="text-sm opacity-80">CRM: {mockData.medico.crm}</div>
               <div className="text-sm opacity-80 mt-2">{currentDateTime}</div>
@@ -218,7 +239,7 @@ export function ProfessionalDashboard() {
           </div>
         </div>
 
-        {/* STATS */}
+        {/* SEÇÃO DE MÉTRICAS (STAT CARDS) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard icon="fa-calendar-day" value={mockData.agendaHoje.length} label="Consultas Hoje" />
           <StatCard icon="fa-users" value="127" label="Pacientes Ativos" />
@@ -226,39 +247,30 @@ export function ProfessionalDashboard() {
           <StatCard icon="fa-prescription" value="24" label="Receitas Emitidas" />
         </div>
 
-        {/* CONTENT ROWS */}
+        {/* GRID PRINCIPAL DE CONTEÚDO (PRIMEIRA LINHA) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Agenda */}
+          {/* Card: Agenda do Dia */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-              <i className="fas fa-bolt mr-2"></i>Ações Rápidas
-            </div>
-            <div className="p-6 max-h-96 overflow-y-auto">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-calendar-alt mr-2"></i>Agenda de Hoje</div>
+            <div className="p-3 space-y-3 max-h-96 overflow-y-auto">
               {mockData.agendaHoje.map((c) => (
-                <div
-                  key={c.id}
-                  className="bg-gray-50 rounded-lg p-3 flex justify-between items-center"
-                >
+                <div key={c.id} className="bg-gray-50 rounded-lg p-3 flex justify-between items-center hover:bg-gray-100 transition-colors">
                   <div>
                     <p className="font-semibold">{c.hora} - {c.paciente}</p>
                     <p className="text-sm text-gray-500">{c.queixa}</p>
                   </div>
-                  <span className="text-xs px-3 py-1 rounded-full bg-gray-200 font-medium">
-                    {c.status}
-                  </span>
+                  <span className="text-xs px-3 py-1 rounded-full bg-gray-200 font-medium">{c.status}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Pacientes Prioritários */}
+          {/* Card: Pacientes Prioritários */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center">
-              <i className="fas fa-user-injured mr-2"></i>Pacientes Prioritários
-            </div>
-            <div className="p-3 space-y-4 max-h-96 overflow-y-auto">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-user-injured mr-2"></i>Pacientes Prioritários</div>
+            <div className="p-3 space-y-3 max-h-96 overflow-y-auto">
               {mockData.pacientesPrioritarios.map((p) => (
-                <div key={p.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                <div key={p.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-3">
                     <img src={p.avatar} alt={p.nome} className="w-12 h-12 rounded-full border" />
                     <div>
@@ -266,125 +278,59 @@ export function ProfessionalDashboard() {
                       <p className="text-sm text-gray-500">{p.condicao}</p>
                     </div>
                   </div>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${priorityStyles[p.prioridade]}`}>
-                    {p.prioridade.toUpperCase()}
-                  </span>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${priorityStyles[p.prioridade]}`}>{p.prioridade.toUpperCase()}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* ROW 2 */}
+        {/* GRID SECUNDÁRIO DE CONTEÚDO (SEGUNDA LINHA) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          {/* AÇÕES RÁPIDAS */}
+          {/* Card: Ações Rápidas */}
           <div className="lg:col-span-1 bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 font-bold flex items-center">
-              <i className="fas fa-bolt mr-2"></i> Ações Rápidas
-            </div>
-
-            {/* Body */}
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex items-center"><i className="fas fa-bolt mr-2"></i> Ações Rápidas</div>
             <div className="p-4 flex-grow flex flex-col">
               <div className="grid grid-cols-2 gap-4">
-                {/* Quick Actions */}
-                <a
-                  href="#"
-                  onClick={() => setIsProntuarioModalOpen(true)}
-                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
-                    <i className="fas fa-file-medical-alt"></i>
-                  </div>
+                <a href="#" onClick={openProntuarioModal} className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2"><i className="fas fa-file-medical-alt"></i></div>
                   <div className="font-semibold text-xs">Novo Prontuário</div>
                 </a>
-
-                <a
-                  href="#"
-                  onClick={openPrescricaoModal}
-                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
-                    <i className="fas fa-prescription"></i>
-                  </div>
+                <a href="#" onClick={openPrescricaoModal} className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2"><i className="fas fa-prescription"></i></div>
                   <div className="font-semibold text-xs">Prescrever</div>
                 </a>
-
-                <a
-                  href="#"
-                  onClick={() => alert("Exames em breve...")}
-                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
-                    <i className="fas fa-microscope"></i>
-                  </div>
+                <a href="#" onClick={() => alert("Exames em breve...")} className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2"><i className="fas fa-microscope"></i></div>
                   <div className="font-semibold text-xs">Solicitar Exame</div>
                 </a>
-
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); navigate('/telemedicina'); }}
-                  className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2">
-                    <i className="fas fa-video"></i>
-                  </div>
+                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/telemedicina'); }} className="flex flex-col items-center p-3 border rounded-lg hover:shadow-lg hover:border-primary transition text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl mb-2"><i className="fas fa-video"></i></div>
                   <div className="font-semibold text-xs">Telemedicina</div>
                 </a>
               </div>
-
-              {/* Botão principal */}
-              <button
-                onClick={() => setIsProntuarioModalOpen(true)}
-                className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition mt-4"
-              >
-                <i className="fas fa-plus mr-2"></i> Atender Paciente
-              </button>
+              <button onClick={openProntuarioModal} className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition mt-auto"><i className="fas fa-plus mr-2"></i> Atender Paciente</button>
             </div>
           </div>
 
-          {/* ATIVIDADE RECENTE */}
+          {/* Card: Atividade Recente (Timeline) */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 font-bold flex justify-between items-center">
-              <span>
-                <i className="fas fa-history mr-2"></i> Atividade Recente
-              </span>
-              <button
-                onClick={() => alert("Relatórios em breve...")}
-                className="text-xs font-semibold bg-white/20 hover:bg-white/30 py-1 px-3 rounded-full transition"
-              >
-                Ver Relatórios
-              </button>
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 font-bold flex justify-between items-center">
+              <span><i className="fas fa-history mr-2"></i> Atividade Recente</span>
+              <button onClick={() => alert("Relatórios em breve...")} className="text-xs font-semibold bg-white/20 hover:bg-white/30 py-1 px-3 rounded-full transition">Ver Relatórios</button>
             </div>
-
-            {/* Body */}
             <div className="p-6 flex-grow overflow-y-auto max-h-96">
               {mockData.atividadeRecente.map((a, index) => (
-                <div
-                  key={a.id}
-                  className={`relative pl-8 pb-4 ${
-                    // Adiciona a linha do tempo em todos, menos no último item
-                    index === mockData.atividadeRecente.length - 1 ? "" : "border-l-2 border-gray-200"
-                    }`}
-                >
-                  {/* Ponto da linha do tempo */}
+                <div key={a.id} className={`relative pl-8 pb-4 ${index === mockData.atividadeRecente.length - 1 ? "" : "border-l-2 border-gray-200"}`}>
                   <div className="absolute -left-[9px] top-1 w-4 h-4 bg-primary rounded-full border-4 border-white"></div>
-
-                  {/* Conteúdo do item */}
                   <div className="flex justify-between items-start">
-                    {/* Lado Esquerdo: Descrição e Detalhes */}
                     <div>
                       <p className="font-bold text-gray-800">{a.descricao}</p>
                       <p className="text-sm text-gray-600">{a.detalhes}</p>
                     </div>
-
-                    {/* Lado Direito: Tempo e Tag de Tipo */}
                     <div className="text-right flex-shrink-0 ml-4">
                       <p className="text-xs text-gray-500">{a.tempo}</p>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full mt-1 inline-block ${activityTypeStyles[a.tipo]}`}>
-                        {a.tipo}
-                      </span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full mt-1 inline-block ${activityTypeStyles[a.tipo]}`}>{a.tipo}</span>
                     </div>
                   </div>
                 </div>
@@ -392,8 +338,11 @@ export function ProfessionalDashboard() {
             </div>
           </div>
         </div>
-
       </main>
+
+      {/* --- MODAIS --- */}
+
+      {/* Modal: Novo Prontuário */}
       <Modal
         isOpen={isProntuarioModalOpen}
         onClose={closeProntuarioModal}
@@ -413,6 +362,7 @@ export function ProfessionalDashboard() {
                 <option value="1">Carlos Santos - 39 anos</option>
                 <option value="2">Maria Oliveira - 52 anos</option>
                 <option value="4">Ana Costa - 65 anos</option>
+                <option value="5">Pedro Lima - 45 anos</option>
               </select>
             </div>
             <div className="md:col-span-1">
@@ -486,22 +436,19 @@ export function ProfessionalDashboard() {
         </form>
       </Modal>
 
-      {/* --- MODAL DE PRESCRIÇÃO --- */}
-      <Modal
-        isOpen={isPrescricaoModalOpen}
-        onClose={closePrescricaoModal}
-        title="Nova Prescrição Médica"
-        size="4xl"
-      >
-        <form onSubmit={(e) => { e.preventDefault(); console.log({paciente: prescricaoPacienteId, medicamentos}); alert('Prescrição Salva!'); closePrescricaoModal(); }}>
+      {/* Modal: Nova Prescrição Médica */}
+      <Modal isOpen={isPrescricaoModalOpen} onClose={closePrescricaoModal} title="Nova Prescrição Médica" size="4xl">
+        <form onSubmit={(e) => { e.preventDefault(); console.log({ paciente: prescricaoPacienteId, medicamentos }); alert('Prescrição Salva!'); closePrescricaoModal(); }}>
           {/* Paciente e Validade */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label htmlFor="prescricaoPaciente" className="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
               <select id="prescricaoPaciente" className="w-full p-2 border border-gray-300 rounded-md" value={prescricaoPacienteId} onChange={(e) => setPrescricaoPacienteId(e.target.value)} required>
                 <option value="">Selecione um paciente</option>
-                <option value="1">Carlos Santos</option>
-                <option value="2">Maria Oliveira</option>
+                <option value="1">Carlos Santos - 39 anos</option>
+                <option value="2">Maria Oliveira - 52 anos</option>
+                <option value="4">Ana Costa - 65 anos</option>
+                <option value="5">Pedro Lima - 45 anos</option>
               </select>
             </div>
             <div>
@@ -509,35 +456,27 @@ export function ProfessionalDashboard() {
               <input type="date" id="validade" className="w-full p-2 border border-gray-300 rounded-md" required />
             </div>
           </div>
-          
+
           {/* Lista Dinâmica de Medicamentos */}
           <div className="space-y-4">
             {medicamentos.map((med, index) => (
               <div key={index} className="bg-gray-50 p-4 rounded-lg border">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <input type="text" placeholder="Nome do medicamento" className="md:col-span-2 p-2 border border-gray-300 rounded-md" 
-                    value={med.nome} onChange={(e) => handleMedicamentoChange(index, 'nome', e.target.value)} />
-                  <input type="text" placeholder="Dosagem (ex: 50mg)" className="p-2 border border-gray-300 rounded-md" 
-                    value={med.dosagem} onChange={(e) => handleMedicamentoChange(index, 'dosagem', e.target.value)} />
+                  <input type="text" placeholder="Nome do medicamento" className="md:col-span-2 p-2 border border-gray-300 rounded-md" value={med.nome} onChange={(e) => handleMedicamentoChange(index, 'nome', e.target.value)} />
+                  <input type="text" placeholder="Dosagem (ex: 50mg)" className="p-2 border border-gray-300 rounded-md" value={med.dosagem} onChange={(e) => handleMedicamentoChange(index, 'dosagem', e.target.value)} />
                 </div>
                 <div className="mt-2 flex items-center gap-3">
-                  <textarea placeholder="Observações (ex: 1x ao dia por 7 dias)" rows={1} className="flex-grow p-2 border border-gray-300 rounded-md"
-                    value={med.obs} onChange={(e) => handleMedicamentoChange(index, 'obs', e.target.value)}></textarea>
-                  {/* Só mostra o botão de remover se houver mais de um medicamento */}
+                  <textarea placeholder="Observações (ex: 1x ao dia por 7 dias)" rows={1} className="flex-grow p-2 border border-gray-300 rounded-md" value={med.obs} onChange={(e) => handleMedicamentoChange(index, 'obs', e.target.value)}></textarea>
                   {medicamentos.length > 1 && (
-                    <button type="button" onClick={() => removeMedicamento(index)} className="px-3 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
-                      <i className="fas fa-trash"></i>
-                    </button>
+                    <button type="button" onClick={() => removeMedicamento(index)} className="px-3 h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"><i className="fas fa-trash"></i></button>
                   )}
                 </div>
               </div>
             ))}
           </div>
-          
+
           {/* Botão para adicionar mais medicamentos */}
-          <button type="button" onClick={addMedicamento} className="mt-4 text-sm font-semibold text-primary hover:text-red-700">
-            <i className="fas fa-plus mr-2"></i>Adicionar outro medicamento
-          </button>
+          <button type="button" onClick={addMedicamento} className="mt-4 text-sm font-semibold text-primary hover:text-red-700"><i className="fas fa-plus mr-2"></i>Adicionar outro medicamento</button>
 
           {/* Botões do Footer */}
           <div className="mt-8 pt-4 border-t flex justify-end space-x-3">
