@@ -35,6 +35,7 @@ import { LeitosPage } from './pages/Admin/LeitosPage.tsx';
 import { SistemPage } from './pages/Admin/SistemPage.tsx';
 import { AgendaPage } from './pages/Professional/AgendaPage.tsx';
 import { AgendamentosPage } from './pages/Patient/AgendamentosPage.tsx';
+import { HistoricoPage } from './pages/Patient/HistoricoPage.tsx';
 
 // Páginas Compartilhadas (Telemedicina)
 import { TelemedicinaPage } from './pages/Shared/TelemedicinaPage.tsx';
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
   { path: '/sistema', element: <SistemPage /> },
   { path: '/agenda', element: <AgendaPage /> },
   { path: '/agendamentos', element: <AgendamentosPage /> },
+  {path: '/historico', element: <HistoricoPage /> },
 
   // Rotas de Telemedicina
   { path: '/telemedicina', element: <TelemedicinaPage /> },
