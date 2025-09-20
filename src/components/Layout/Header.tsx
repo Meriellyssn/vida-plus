@@ -21,6 +21,7 @@
 
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import logoVidaPlus from '/src/assets/logo-branca.png';
 
 // --- Configuração centralizada dos menus ---
 const navLinksConfig = {
@@ -94,7 +95,7 @@ export function Header() {
           {/* Logo */}
           <NavLink to={homePath} className="text-2xl font-bold flex items-center">
             <img
-              src="../../src/assets/logo-branca.png"
+              src={logoVidaPlus}
               alt="Logo VidaPlus Branca"
               className="w-8 h-8 mr-2"
             />
