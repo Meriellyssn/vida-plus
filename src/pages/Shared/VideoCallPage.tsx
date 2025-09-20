@@ -46,7 +46,7 @@ function VideoCallSimulation() {
     // --- Gerenciamento de Estado ---
     const [videoEnabled, setVideoEnabled] = useState(true);
     const [audioEnabled, setAudioEnabled] = useState(true);
-    const [chatOpen, setChatOpen] = useState(true); // Chat aberto por padrão para facilitar o acesso
+    const [chatOpen] = useState(true); // Chat aberto por padrão para facilitar o acesso
     const [callDuration, setCallDuration] = useState(0);
 
     /**

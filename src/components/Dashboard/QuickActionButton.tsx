@@ -12,8 +12,6 @@
  * @since 2025
  */
 
-import React from 'react';
-
 // ----------------------------
 // Tipos e interfaces
 // ----------------------------

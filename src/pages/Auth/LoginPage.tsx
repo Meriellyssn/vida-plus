@@ -46,7 +46,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('paciente@vidaplus.com'); // valor inicial para testes
   const [password, setPassword] = useState('123456'); // valor inicial para testes
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+  const [errors] = useState<{ email?: string; password?: string }>( // setErrors: implementar validação.
     {}
   );
 
