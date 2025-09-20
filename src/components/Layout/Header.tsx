@@ -94,7 +94,7 @@ export function Header() {
           {/* Logo */}
           <NavLink to={homePath} className="text-2xl font-bold flex items-center">
             <img
-              src="/src/assets/logo-branca.png"
+              src="../../assets/logo-branca.png"
               alt="Logo VidaPlus Branca"
               className="w-8 h-8 mr-2"
             />
