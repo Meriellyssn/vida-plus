@@ -31,6 +31,8 @@ import { ProfessionalDashboard } from './pages/Dashboard/ProfessionalDashboard.t
 // Páginas Internas por Perfil
 import { UsersPage } from './pages/Admin/UsersPage.tsx';
 import { ReportsPage } from './pages/Admin/ReportsPage.tsx';
+import { LeitosPage } from './pages/Admin/LeitosPage.tsx';
+import { SistemPage } from './pages/Admin/SistemPage.tsx';
 import { AgendaPage } from './pages/Professional/AgendaPage.tsx';
 import { AgendamentosPage } from './pages/Patient/AgendamentosPage.tsx';
 
@@ -60,7 +62,9 @@ const router = createBrowserRouter([
   
   // Rotas internas específicas de cada perfil
   { path: '/usuarios', element: <UsersPage /> },
+  { path: '/leitos', element: <LeitosPage /> },
   { path: '/relatorios', element: <ReportsPage /> },
+  { path: '/sistema', element: <SistemPage /> },
   { path: '/agenda', element: <AgendaPage /> },
   { path: '/agendamentos', element: <AgendamentosPage /> },
 
