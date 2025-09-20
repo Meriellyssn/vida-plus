@@ -1,3 +1,24 @@
+/*
+ * Folha de Estilos Principal - Sistema Vida Plus
+ *
+ * Este arquivo contém os estilos globais e as classes utilitárias
+ * utilizadas na aplicação. As regras aqui definidas servem como base
+ * para a aparência de componentes e da estrutura geral das páginas.
+ *
+ * @author Meirielli S. Sousa do N. 
+ * @version 1.0.0
+ * @since 2025
+ */
+
+/* --- ESTRUTURA GERAL DA PÁGINA --- */
+
+/**
+ * Define o container principal da aplicação.
+ * - `max-width`: Limita a largura do conteúdo para melhor legibilidade em telas grandes.
+ * - `margin`: Centraliza o container na página.
+ * - `padding`: Adiciona espaçamento interno.
+ * - `text-align`: Centraliza o texto dentro do container.
+ */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,38 +26,20 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+/* --- COMPONENTES GENÉRICOS --- */
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/**
+ * Classe para estilizar componentes de "card",
+ * adicionando um espaçamento interno padrão.
+ */
 .card {
   padding: 2em;
 }
 
+/**
+ * Estilo para textos secundários ou informativos,
+ * aplicando uma cor mais suave.
+ */
 .read-the-docs {
   color: #888;
 }
